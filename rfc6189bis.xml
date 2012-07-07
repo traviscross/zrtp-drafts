@@ -5,7 +5,7 @@
 <?rfc tocdepth="5"?>
 <?rfc rfcedstyle="yes"?>
 <?rfc subcompact="no"?>
-<rfc ipr="trust200902" number="6189" category="info"
+<rfc ipr="trust200902" number="6189bis" category="info"
   submissionType="IETF" consensus="yes">
 <front>
 <title abbrev="ZRTP">ZRTP: Media Path Key Agreement for Unicast Secure RTP</title>
@@ -33,7 +33,7 @@
   <email>jon@callas.org</email>
   </address> </author>
 
-  <date month="April" year="2011"/>
+  <date month="July" year="2012"/>
 
 <abstract>
 <t>
@@ -148,7 +148,6 @@ Alice                                                Bob
  |                    SRTP begins                    |
  |<=================================================>|
  |                                                   |
-
 ]]></artwork></figure>
 
 <t>
@@ -172,7 +171,7 @@ Multistream mode is an alternative key agreement method used when two endpoints 
 <t>
 When Multistream mode is indicated in the Commit message, a call flow similar to <xref target='CallFlow'/> is used, but no DH calculation is performed by either endpoint and the DHPart1 and DHPart2 messages are omitted.  The Confirm1, Confirm2, and Conf2ACK messages are still sent.  Since the cache is not affected during this mode, multiple Multistream ZRTP exchanges can be performed in parallel between two endpoints. </t>
 <t>
-When adding additional media streams to an existing call, only Multistream mode is used.  Only one DH operation is performed, just for the first media stream. </t>
+When adding additional media streams to an existing call, only Multistream mode is used.  Only one DH operation is performed, just for the first media stream.  Consequently, all the media streams in the session share the same <xref target='SAS'>SAS</xref>. </t>
 </section>
 
 </section>
@@ -331,13 +330,11 @@ The DHPart1 and DHPart2 messages contain a list of hashes of these shared secret
 <t>
 If no secret of a given type is available, a random value is generated and used for that secret to ensure a mismatch in the hash comparisons in the DHPart1 and DHPart2 messages.  This prevents an eavesdropper from knowing which types of shared secrets are available between the endpoints. </t>
 <t>
-<xref target='SharedSecretHashesCalc'/> refers to the auxiliary shared secret auxsecret.  The auxsecret shared secret may be defined by the VoIP user agent out-of-band from the ZRTP protocol.  In some cases, it may be provided by the signaling layer as srtps, which is defined in <xref target='derive_srtps'/>. If it is not provided by the signaling layer, the auxsecret shared secret may be manually provisioned in other application-specific ways that are out of band, such as computed from a hashed pass phrase by prior agreement between the two parties or supplied by a hardware token.  Or, it may be a family key used by an institution to which the two parties both belong.  It is a generalized mechanism for providing a shared secret that is agreed to between the two parties out of scope of the ZRTP protocol. It is expected that most typical ZRTP endpoints will rarely use auxsecret. </t>
+<xref target='SharedSecretHashesCalc'/> refers to the auxiliary shared secret auxsecret.  The auxsecret shared secret may be defined by the VoIP user agent out-of-band from the ZRTP protocol.  It may be manually provisioned in application-specific ways, such as computed from a hashed pass phrase by prior agreement between the two parties or supplied by a hardware token.  Or, it may be a family key used by an institution to which the two parties both belong.  It is a generalized mechanism for providing a shared secret that is agreed to between the two parties out of scope of the ZRTP protocol. <!-- In some cases, it may be imported from the signaling layer via the mechanism defined in <xref target='derive_auxsecret_from_sdes'/>.--> It is expected that most typical ZRTP endpoints will rarely use auxsecret. </t>
 <t>
-For both the initiator and the responder, the shared secrets s1, s2, and s3 will be calculated so that they can all be used later to calculate s0 in <xref target='DHSecretCalc'/>.  Here is how s1, s2, and s3 are calculated by both parties.
-</t>
+For both the initiator and the responder, the shared secrets s1, s2, and s3 will be calculated so that they can all be used later to calculate s0 in <xref target='DHSecretCalc'/>.  Here is how s1, s2, and s3 are calculated by both parties. </t>
 <t>
 The shared secret s1 will be either the initiator's rs1 or the initiator's rs2, depending on which of them can be found in the responder's cache. If the initiator's rs1 matches the responder's rs1 or rs2, then s1 MUST be set to the initiator's rs1.  If and only if that match fails, then if the initiator's rs2 matches the responder's rs1 or rs2, then s1 MUST be set to the initiator's rs2.  If that match also fails, then s1 MUST be set to null. The complexity of the s1 calculation is to recover from any loss of cache sync from an earlier aborted session, due to the <xref target='Byzantine'>Two Generals' Problem</xref>. </t>
-
 <t>
 The shared secret s2 MUST be set to the value of auxsecret if and only if both parties have matching values for auxsecret, as determined by comparing the hashes of auxsecret sent in the DH messages.  If they don't match, s2 MUST be set to null. </t>
 <t>
@@ -352,21 +349,21 @@ The comparison of hashes of rs1, rs2, auxsecret, and pbxsecret is described in <
 <t>
 Both parties calculate a set of non-invertible hashes (implemented via the MAC defined in <xref target='NegotiatedHash'/>) of shared secrets that may be present in each of their caches.  These hashes are truncated to the leftmost 64 bits: </t>
 <figure><artwork>
-   rs1IDr = MAC(rs1, "Responder") 
+  rs1IDr = MAC(rs1, "Responder") 
 
-   rs2IDr = MAC(rs2, "Responder") 
+  rs2IDr = MAC(rs2, "Responder") 
 
-   auxsecretIDr = MAC(auxsecret, Responder's H3) 
+  auxsecretIDr = MAC(auxsecret, Responder's H3) 
 
-   pbxsecretIDr = MAC(pbxsecret, "Responder") 
+  pbxsecretIDr = MAC(pbxsecret, "Responder") 
 
-   rs1IDi = MAC(rs1, "Initiator") 
+  rs1IDi = MAC(rs1, "Initiator") 
 
-   rs2IDi = MAC(rs2, "Initiator") 
+  rs2IDi = MAC(rs2, "Initiator") 
 
-   auxsecretIDi = MAC(auxsecret, Initiator's H3) 
+  auxsecretIDi = MAC(auxsecret, Initiator's H3) 
 
-   pbxsecretIDi = MAC(pbxsecret, "Initiator") 
+  pbxsecretIDi = MAC(pbxsecret, "Initiator") 
 </artwork></figure>
 <t>
 The responder sends rs1IDr, rs2IDr, auxsecretIDr, and pbxsecretIDr in the DHPart1 message.  The initiator sends rs1IDi, rs2IDi, auxsecretIDi, and pbxsecretIDi in the DHPart2 message.  </t>
@@ -444,7 +441,7 @@ A Diffie-Hellman mode is selected by setting the Key Agreement Type in the Commi
 <t>
 For Finite Field Diffie-Hellman, the value for the DH generator g, the DH prime p, and the length of the DH secret value, svi, are defined in <xref target='KeyAgreementType'/>. </t>
 <figure><artwork>
-   pvi = g^svi mod p 
+  pvi = g^svi mod p 
 </artwork></figure>
 <t>
 where g and p are determined by the Key Agreement Type value.  The DH public value pvi value is formatted as a big-endian octet string and fixed to the bit-length of the DH prime; leading zeros MUST NOT be truncated. </t>
@@ -453,8 +450,8 @@ For Elliptic Curve DH, pvi is calculated and formatted according to the ECDH spe
 <t>
 The hash commitment is performed by the initiator of the ZRTP exchange.  The hash value of the initiator, hvi, includes a hash of the entire DHPart2 message as shown in <xref target='DHPart2_Msg'/> (which includes the Diffie-Hellman public value, pvi), and the responder's Hello message (where '||' means concatenation).  The hvi hash is truncated to 256 bits: </t>
 <figure><artwork>
-   hvi = hash(initiator's DHPart2 message || 
-                        responder's Hello message) 
+  hvi = hash(initiator's DHPart2 message || 
+             responder's Hello message) 
 </artwork></figure>
 <t>
 Note that the Hello message includes the fields shown in <xref target='Hello_Msg'/>. </t>
@@ -473,7 +470,7 @@ Upon receipt of the Commit message, the responder generates its own fresh random
 <t>
 For Finite Field Diffie-Hellman, the value for the DH generator g, the DH prime p, and the length of the DH secret value, svr, are defined in <xref target='KeyAgreementType'/>. </t>
 <figure><artwork>
-   pvr = g^svr mod p 
+  pvr = g^svr mod p 
 </artwork></figure>
 <t>
 The pvr value is formatted as a big-endian octet string, fixed to the bit-length of the DH prime; leading zeros MUST NOT be truncated. </t>
@@ -484,7 +481,7 @@ Upon receipt of the DHPart2 message, the responder checks that the initiator's D
 <t>
 The responder then calculates the Diffie-Hellman result: </t>
 <figure><artwork>
-   DHResult = pvi^svr mod p 
+  DHResult = pvi^svr mod p 
 </artwork></figure>
 </section>
 
@@ -497,7 +494,7 @@ The initiator then sends a DHPart2 message containing the initiator's DH public 
 <t>
 The initiator calculates the same Diffie-Hellman result using: </t>
 <figure><artwork>
-   DHResult = pvr^svi mod p 
+  DHResult = pvr^svi mod p 
 </artwork></figure>
 </section>
 
@@ -506,8 +503,8 @@ The initiator calculates the same Diffie-Hellman result using: </t>
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange in the following order is calculated by both parties: </t>
 <figure><artwork>
-   total_hash = hash(Hello of responder || Commit || DHPart1 || 
-                        DHPart2)
+  total_hash = hash(Hello of responder || Commit || 
+                    DHPart1 || DHPart2)
 </artwork></figure>
 <t>
 Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format="counter"/>, <xref target='DHCommit_Msg' format="counter"/>, <xref target='DHPart1_Msg' format="counter"/>, and <xref target='DHPart2_Msg' format="counter"/>), not the entire ZRTP packets, are included in the total_hash. </t>
@@ -515,17 +512,17 @@ Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format="count
 For both the initiator and responder, the DHResult is formatted as a big-endian octet string and fixed to the width of the DH prime; leading zeros MUST NOT be truncated.  For example, for a 3072-bit p, DHResult would be a 384 octet value, with the first octet the most significant.  DHResult may also be the result of an ECDH calculation, which is discussed in <xref target='KeyAgreementType'/>. </t>
 
 <figure><artwork>
-Key        | Size of
-Agreement  | DHResult
-------------------------
-DH-3072    | 384 octets
-------------------------
-DH-2048    | 256 octets
-------------------------
-ECDH P-256 |  32 octets
-------------------------
-ECDH P-384 |  48 octets
-------------------------
+  Key        | Size of
+  Agreement  | DHResult
+  ------------------------
+  DH-3072    | 384 octets
+  ------------------------
+  DH-2048    | 256 octets
+  ------------------------
+  ECDH P-256 |  32 octets
+  ------------------------
+  ECDH P-384 |  48 octets
+  ------------------------
 </artwork></figure>
 
 <t>
@@ -533,9 +530,9 @@ The authors believe the calculation of the final shared secret, s0, is in compli
 <t>
 In Section 5.8.1 of <xref target="NIST-SP800-56A"/>, NIST requires certain parameters to be hashed together in a particular order, which NIST refers to as:  Z, AlgorithmID, PartyUInfo, PartyVInfo, SuppPubInfo, and SuppPrivInfo.  In our implementation, our DHResult corresponds to Z, "ZRTP-HMAC-KDF" corresponds to AlgorithmID, our ZIDi and ZIDr correspond to PartyUInfo and PartyVInfo, our total_hash corresponds to SuppPubInfo, and the set of three shared secrets s1, s2, and s3 corresponds to SuppPrivInfo.  NIST also requires a 32-bit big-endian integer counter to be included in the hash each time the hash is computed, which we have set to the fixed value of 1 because we only compute the hash once.  NIST refers to the final hash output as DerivedKeyingMaterial, which corresponds to our s0 in this calculation. </t>
 <figure><artwork>
-   s0 = hash(counter || DHResult || "ZRTP-HMAC-KDF" || ZIDi || 
-             ZIDr || total_hash || len(s1) || s1 || len(s2) || 
-             s2 || len(s3) || s3)
+  s0 = hash(counter || DHResult || "ZRTP-HMAC-KDF" || 
+            ZIDi || ZIDr || total_hash || len(s1) || s1 || 
+            len(s2) || s2 || len(s3) || s3)
 </artwork></figure>
 <t>
 Note that temporary values s1, s2, and s3 were calculated per the methods described in <xref target='SharedSecretDetermination'/>.  DHResult, s1, s2, and s3 MUST all be erased from memory immediately after they are used to calculate s0. </t>
@@ -546,7 +543,7 @@ The authors believe ZRTP DH mode is in full compliance with two relevant NIST do
 <t>
 The <xref target='ZRTP_KDF'>ZRTP key derivation function (KDF)</xref> requires the use of a KDF Context field (per <xref target="NIST-SP800-108"/> guidelines), which should include the ZIDi, ZIDr, and a nonce value known to both parties.  The total_hash qualifies as a nonce value, because its computation included nonce material from the initiator's Commit message and the responder's Hello message. </t>
 <figure><artwork>
-   KDF_Context = (ZIDi || ZIDr || total_hash) 
+  KDF_Context = (ZIDi || ZIDr || total_hash) 
 </artwork></figure>
 <t>
 At this point in DH mode, the two endpoints proceed to the key derivations of ZRTPSess and the rest of the keys in <xref target='DerivingZRTPSess'/>, now that there is a defined s0. </t>
@@ -583,8 +580,9 @@ The Commit message (<xref target='PrshCommit_Msg'/>) is sent by the initiator of
 <t>
 To assemble a Preshared commit, we must first construct a temporary preshared_key, which is constructed from one of several possible combinations of cached key material, depending on what is available in the shared secret cache.  If rs1 is not available in the initiator's cache, then Preshared mode MUST NOT be used. </t>
 <figure><artwork>
-   preshared_key = hash(len(rs1) || rs1 || len(auxsecret) || auxsecret || 
-                        len(pbxsecret) || pbxsecret) 
+  preshared_key = hash(len(rs1) || rs1 || 
+                       len(auxsecret) || auxsecret || 
+                       len(pbxsecret) || pbxsecret) 
 </artwork></figure>
 <t>
 All of the explicit length fields, len(), in the above hash are 32-bit big-endian integers, giving the length in octets of the field that follows.  Some members of the set of shared secrets (rs1, auxsecret, and pbxsecret) may have lengths of zero if they are null (not available), and are each preceded by a 4-octet length field.  For example, if auxsecret is null, len(auxsecret) is 0x00000000, and auxsecret itself would be absent from the hash calculation, which means len(pbxsecret) would immediately follow len(auxsecret). </t>
@@ -629,20 +627,20 @@ and the H3 field in the responder's <xref target='Hello_Msg'>Hello message</xref
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange for the current media stream is calculated: </t>
 <figure><artwork>
-   total_hash = hash(Hello of responder || Commit)
+  total_hash = hash(Hello of responder || Commit)
 </artwork></figure>
 <t>
 Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format='counter'/> and <xref target='PrshCommit_Msg' format='counter'/>), not the entire ZRTP packets, are included in the total_hash. </t>
 <t>
 The <xref target='ZRTP_KDF'>ZRTP key derivation function (KDF)</xref> requires the use of a KDF Context field (per <xref target="NIST-SP800-108"/> guidelines), which should include the ZIDi, ZIDr, and a nonce value known to both parties.  The total_hash qualifies as a nonce value, because its computation included nonce material from the initiator's Commit message and the responder's Hello message. </t>
 <figure><artwork>
-   KDF_Context = (ZIDi || ZIDr || total_hash) 
+  KDF_Context = (ZIDi || ZIDr || total_hash) 
 </artwork></figure>
 <t>
 The s0 key is derived via the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref> from preshared_key and the nonces implicitly included in the total_hash.  The nonces also ensure KDF_Context is unique for each session, which is critical for security. </t>
 <figure><artwork>
-   s0 = KDF(preshared_key, "ZRTP PSK", KDF_Context, 
-                negotiated hash length)
+  s0 = KDF(preshared_key, "ZRTP PSK", 
+           KDF_Context, negotiated hash length)
 </artwork></figure>
 <t>
 The preshared_key MUST be erased as soon as it has been used to calculate s0. </t>
@@ -695,20 +693,20 @@ and the H3 field in the responder's <xref target='Hello_Msg'>Hello message</xref
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange for the current media stream is calculated: </t>
 <figure><artwork>
-   total_hash = hash(Hello of responder || Commit) 
+  total_hash = hash(Hello of responder || Commit) 
 </artwork></figure>
 <t>
 This refers to the Hello and Commit messages for the current media stream, which is using Multistream mode, not the original media stream that included a full DH key agreement.  Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format='counter'/> and <xref target='MultCommit_Msg' format='counter'/>), not the entire ZRTP packets, are included in the hash. </t>
 <t>
 The <xref target='ZRTP_KDF'>ZRTP key derivation function (KDF)</xref> requires the use of a KDF Context field (per <xref target="NIST-SP800-108"/> guidelines), which should include the ZIDi, ZIDr, and a nonce value known to both parties.  The total_hash qualifies as a nonce value, because its computation included nonce material from the initiator's Commit message and the responder's Hello message. </t>
 <figure><artwork>
-   KDF_Context = (ZIDi || ZIDr || total_hash) 
+  KDF_Context = (ZIDi || ZIDr || total_hash) 
 </artwork></figure>
 <t>
 The current stream's SRTP keys and salts for the initiator and responder are calculated using the ZRTP Session Key ZRTPSess and the nonces implicitly included in the total_hash.  The nonces also ensure that KDF_Context will be unique for each media stream, which is critical for security.  For each additional media stream, a separate s0 is derived from ZRTPSess via the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref>: </t>
 <figure><artwork>
-   s0 = KDF(ZRTPSess, "ZRTP MSK", KDF_Context,
-                          negotiated hash length)
+  s0 = KDF(ZRTPSess, "ZRTP MSK", 
+           KDF_Context, negotiated hash length)
 </artwork></figure>
 <t>
 Note that the ZRTPSess key was previously derived from material that also includes a different and more inclusive total_hash from the entire packet sequence that performed the original DH exchange for the first media stream in this ZRTP session. </t>
@@ -735,8 +733,8 @@ The ZRTP KDF runs the NIST pseudorandom function (PRF) in counter mode, with onl
 <t>
 The ZRTP KDF is defined in this manner, per Sections 5 and 5.1 of <xref target="NIST-SP800-108"/>: </t>
 <figure><artwork>
-   KDF(KI, Label, Context, L) = HMAC(KI, i || Label || 
-         0x00 || Context || L)
+  KDF(KI, Label, Context, L) = 
+    HMAC(KI, i || Label || 0x00 || Context || L)
 </artwork></figure>
 <t>
 The HMAC in the KDF is keyed by KI, which is a secret key derivation key that is unknown to the wiretapper (for example, s0).  The HMAC is computed on a 
@@ -755,25 +753,25 @@ Both DH mode and Preshared mode (but not Multistream mode) come to this common p
 The ZRTPSess key is used only for these two purposes:  1) to <xref target='MultSecretCalc'>generate the additional s0 keys</xref> for adding additional media streams to this session in Multistream mode, and 2) to <xref target='PBXenrollment'>generate the pbxsecret</xref> that may be cached for use in future sessions. 
 The ZRTPSess key is kept for the duration of the call signaling session between the two ZRTP endpoints.  That is, if there are two separate calls between the endpoints (in SIP terms, separate SIP dialogs), then a ZRTP Session Key MUST NOT be used across the two call signaling sessions.  ZRTPSess MUST be destroyed no later than the end of the call signaling session. </t>
 <figure><artwork>
-   ZRTPSess = KDF(s0, "ZRTP Session Key", KDF_Context, 
-                    negotiated hash length)
+  ZRTPSess = KDF(s0, "ZRTP Session Key", 
+                 KDF_Context, negotiated hash length)
 </artwork></figure>
 <t>
 Note that KDF_Context is unique for each media stream, but only the first media stream is permitted to calculate ZRTPSess. </t>
 <t>
 There is only one <xref target='SAS'>Short Authentication String (SAS)</xref>  computed per call, which is applicable to all media streams derived from a single DH key agreement in a ZRTP session.  KDF_Context is unique for each media stream, but only the first media stream is permitted to calculate sashash. </t>
 <figure><artwork>
-   sashash = KDF(s0, "SAS", KDF_Context, 256)
+  sashash = KDF(s0, "SAS", KDF_Context, 256)
 
-   sasvalue = sashash [truncated to leftmost 32 bits]
+  sasvalue = sashash [truncated to leftmost 32 bits]
 </artwork></figure>
 <t>
 Despite the exposure of the SAS to the two parties, the rest of the keying material is protected by the <xref target='ZRTP_KDF'>key separation properties of the KDF</xref>. </t>
 <t>
 ZRTP-enabled VoIP clients may need to support additional forms of communication, such as text chat, instant messaging, or file transfers.  These other forms of communication may need to be encrypted, and would benefit from leveraging the ZRTP key exchange used for the VoIP part of the call.  In that case, more key material MAY be derived and "exported" from the ZRTP protocol and provided as a shared secret to the VoIP client for these non-VoIP purposes.  The application can use this exported key in application-specific ways, outside the scope of the ZRTP protocol. </t>
 <figure><artwork>
-   ExportedKey = KDF(s0, "Exported key", KDF_Context, 
-                        negotiated hash length) 
+  ExportedKey = KDF(s0, "Exported key", 
+                    KDF_Context, negotiated hash length) 
 </artwork></figure>
 <t>
 Only one ExportedKey is computed per call.  KDF_Context is unique for each media stream, but only the first media stream is permitted to calculate ExportedKey. </t>
@@ -796,33 +794,35 @@ Separate SRTP master keys and master salts are derived for use in each direction
 <t>
 The ZRTP initiator encrypts and the ZRTP responder decrypts packets by using srtpkeyi and srtpsalti, while the ZRTP responder encrypts and the ZRTP initiator decrypts packets by using srtpkeyr and srtpsaltr.  The SRTP key and salt values are truncated (taking the leftmost bits) to the length determined by the chosen SRTP profile.  These are generated by: </t>
 <figure><artwork>
-   srtpkeyi = KDF(s0, "Initiator SRTP master key", KDF_Context, 
-                   negotiated AES key length)
+  srtpkeyi = KDF(s0, "Initiator SRTP master key", 
+                 KDF_Context, negotiated AES key length)
 
-   srtpsalti = KDF(s0, "Initiator SRTP master salt", KDF_Context, 112) 
+  srtpsalti = KDF(s0, "Initiator SRTP master salt", 
+                  KDF_Context, 112) 
 
-   srtpkeyr = KDF(s0, "Responder SRTP master key", KDF_Context, 
-                   negotiated AES key length) 
+  srtpkeyr = KDF(s0, "Responder SRTP master key", 
+                 KDF_Context, negotiated AES key length) 
 
-   srtpsaltr = KDF(s0, "Responder SRTP master salt", KDF_Context, 112) 
+  srtpsaltr = KDF(s0, "Responder SRTP master salt", 
+                  KDF_Context, 112) 
 </artwork></figure>
 <t>
 The MAC keys are the same length as the output of the underlying hash function in the KDF and are thus generated without truncation.  They are used only by ZRTP and not by SRTP.  Different MAC keys are needed for the initiator and the responder to ensure that GoClear messages in each direction are unique and can not be cached by an attacker and reflected back to the endpoint. </t>
 <figure><artwork>
-   mackeyi = KDF(s0, "Initiator HMAC key", KDF_Context, 
-                   negotiated hash length) 
+  mackeyi = KDF(s0, "Initiator HMAC key", 
+                KDF_Context, negotiated hash length) 
 
-   mackeyr = KDF(s0, "Responder HMAC key", KDF_Context, 
-                   negotiated hash length) 
+  mackeyr = KDF(s0, "Responder HMAC key", 
+                KDF_Context, negotiated hash length) 
 </artwork></figure>
 <t>
 ZRTP keys are generated for the initiator and responder to use to encrypt the Confirm1 and Confirm2 messages.  They are truncated to the same size as the negotiated SRTP key size. </t>
 <figure><artwork>
-   zrtpkeyi = KDF(s0, "Initiator ZRTP key", KDF_Context, 
-                   negotiated AES key length) 
+  zrtpkeyi = KDF(s0, "Initiator ZRTP key", 
+                 KDF_Context, negotiated AES key length) 
 
-   zrtpkeyr = KDF(s0, "Responder ZRTP key", KDF_Context, 
-                   negotiated AES key length) 
+  zrtpkeyr = KDF(s0, "Responder ZRTP key", 
+                 KDF_Context, negotiated AES key length) 
 </artwork></figure>
 <t>
 All key material is destroyed as soon as it is no longer needed, no later than the end of the call.  s0 is erased in <xref target='CacheUpdate'/>, and the rest of the session key material is erased in Sections <xref target='keydestruct1' format="counter"/> and <xref target='keydestruct2' format="counter"/>. </t>
@@ -834,17 +834,17 @@ All key material is destroyed as soon as it is no longer needed, no later than t
 <t>
 The Confirm1 and Confirm2 messages (<xref target='Confirm_Msg'/>) contain the cache expiration interval (defined in <xref target='CacheOperation'/>) for the newly generated retained shared secret. The flagoctet is an 8-bit unsigned integer made up of these flags: the PBX Enrollment flag (E) defined in <xref target='PBXenrollment'/>, the SAS Verified flag (V) defined in <xref target='SASVerifiedFlag'/>, the Allow Clear flag (A) defined in <xref target='GoClearTermination'/>, and the Disclosure flag (D) defined in <xref target='DisclosureFlag'/>. </t>
 <figure><artwork>
-   flagoctet =  (E * 2^3) + (V * 2^2) + (A * 2^1) + (D * 2^0) 
+  flagoctet =  (E * 2^3) + (V * 2^2) + (A * 2^1) + (D * 2^0) 
 </artwork></figure>
 <t>
 Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode and contain a 128-bit random Cipher FeedBack (CFB) Initialization Vector (IV).  The Confirm1 and Confirm2 messages also contain a MAC covering the encrypted part of the Confirm1 or Confirm2 message that includes a string of zeros, the signature length, flag octet, cache expiration interval, signature type block (if present), and <xref target="SignSAS">signature</xref> (if present).  For the responder: </t>
 <figure><artwork>
-   confirm_mac = MAC(mackeyr, encrypted part of Confirm1) 
+  confirm_mac = MAC(mackeyr, encrypted part of Confirm1) 
 </artwork></figure>
 <t>
 For the initiator: </t>
 <figure><artwork>
-   confirm_mac = MAC(mackeyi, encrypted part of Confirm2) 
+  confirm_mac = MAC(mackeyi, encrypted part of Confirm2) 
 </artwork></figure>
 <t>
 The mackeyi and mackeyr keys are computed in <xref target='DerivingKeys'/>. </t>
@@ -867,18 +867,21 @@ After receiving the Confirm messages, both parties must now update their retaine
  The initiator MUST receive either the responder's Conf2ACK message or the responder's SRTP media (with a valid SRTP auth tag) before updating the initiator's cache. </t>
 </list></t>
 <t>
-The cache update may also be affected by a cache mismatch, according to <xref target='CacheUpdateException'/>. </t>
+The cache update may also be affected by a cache mismatch, according to <xref target='CacheUpdateException'/> or <xref target='CacheUpdatePBX'/>. </t>
 <t>
 For DH mode only, before updating the retained shared secret rs1 in the cache, each party first discards their old rs2 and copies their old rs1 to rs2. The old rs1 is saved to rs2 because of the risk of session interruption after one party has updated his own rs1 but before the other party has enough information to update her own rs1.  If that happens, they may regain cache sync in the next session by using rs2 (per <xref target='SharedSecretDetermination'/>).  This mitigates the well-known <xref target='Byzantine'>Two Generals' Problem</xref>. The old rs1 value is not saved in Preshared mode. </t>
 <t>
 For DH mode and Preshared mode, both parties compute a new rs1 value from s0 via the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref>: </t>
 <figure><artwork>
-   rs1 = KDF(s0, "retained secret", KDF_Context, 256) 
+  rs1 = KDF(s0, "retained secret", KDF_Context, 256) 
 </artwork></figure>
 <t>
 Note that KDF_Context is unique for each media stream, but only the first media stream is permitted to update rs1. </t>
 <t>
 Each media stream has its own s0.  At this point in the protocol for each media stream, the corresponding s0 MUST be erased. </t>
+
+<t>
+If a cache update is appropriate, subject to the above conditions and not delayed by a cache mismatch, it should be done as follows.  Both ZRTP endpoints SHOULD commit the new rs1 to nonvolatile storage immediately upon receiving the remote party's Confirm message.  The initiator should write the new rs1 before sending the Confirm2 message, and the responder should write the new rs1 before sending any SRTP media.  This means no SRTP media will be sent by either party until the new rs1 is saved by both parties.  After receiving evidence that the remote party has committed the new rs1 to nonvolatile storage, rs2 (the old value of rs1) SHOULD be discarded.  Receiving a few packets of properly formed SRTP media after the Confirm message would be evidence that the remote party has remained functioning long enough to commit the new rs1 to nonvolatile storage.  A brief interval (about one second of encrypted media) should be sufficient for rs1 to be properly saved across a cluster of distributed load-sharing PBXs that share a common cache.  A good strategy is to hold back from committing rs2 to nonvolatile storage for this brief interval, and commit it to nonvolatile storage only if the connection is lost during that interval, or if encrypted media fails to appear within a reasonable time.  Since this would be a rare event, in most cases rs2 would not be saved.  If rs2 is saved unconditionally, it would have the undesirable effect of lengthening the window of vulnerability for a MiTM attack if the cache is captured by an attacker, as described in <xref target='selfhealing'/>. </t>
 
 <section anchor='CacheUpdateException' title="Cache Update Following a Cache Mismatch">
 <t>
@@ -890,9 +893,28 @@ Successful use of the mechanism described in <xref target='LeveragingIntegrityPr
 A good signature is received and verified using the digital signature feature on the SAS hash, as described in <xref target='SignSAS'/>, if this feature is supported. </t>
 </list></t>
 <t>
-If there is a cache mismatch in the absence of the aforementioned mitigating evidence, the cache update MUST be delayed in the current session until the user verbally compares the SAS with his partner during the call and confirms a successful SAS verify via his user interface as described in <xref target='SASVerifiedFlag'/>.  If the session ends before that happens, the cache update is not performed, leaving the rs1/rs2 values unmodified in the cache.  Regardless of whether a cache mismatch occurs, s0 must still be erased. </t>
+If there is a cache mismatch in the absence of the aforementioned mitigating evidence, the cache update MUST be delayed in the current session until the user verbally compares the SAS with his partner during the call and confirms a successful SAS verify via his user interface as described in <xref target='SASVerifiedFlag'/>.  If the session ends before that happens, the cache update is not performed, leaving the rs1/rs2 values unmodified in the cache.  The local SAS Verified (V) flag is also left unmodified in this case. </t>
+<t>
+This means the caches will continue to be mismatched on subsequent calls, and the user will thus be alerted of this security condition on every call until the SAS is verified.  Or, if the cache mismatches are caused by an actual MiTM attack instead of a cache mishap, the alerts will continue on every call until the caches match again because the MiTM attacker ceased his attacks.  In that case, the cache entries and related (V) flags are unscathed by the MiTM attacker when the attacks cease.  The MiTM attacker is thus foiled from even having a denial-of-service effect on the caches. </t>
+<t>
+If the user verbally compares the SAS with his partner during the call and confirms a successful SAS verify via his user interface, the local cache is then updated.  Note that in this case rs2 (the old value of rs1) must also be saved, to mitigate the possibility of the remote user failing to update. </t>
+<t>
+Regardless of whether a cache mismatch occurs, s0 must still be erased. </t>
 <t>
 If no cache entry exists, as is the case in the initial call, the cache update is handled in the normal fashion. </t>
+
+</section>
+
+<section anchor='CacheUpdatePBX' title="Cache Update for a PBX Following a Cache Mismatch">
+<t>
+In the event of a cache mismatch, a PBX MUST NOT update the cache if there is a pbxsecret defined on the PBX, but it does not match the pbxsecret of the remote endpoint.  Otherwise, the PBX MUST update the cache, notwithstanding <xref target='CacheUpdateException'/>. </t>
+<t>
+Rationale:  If a ZRTP endpoint is enrolled with a PBX, it is desirable that the PBX's cache is not easily disrupted by an attempted MiTM attack.  The enrolled phone should also not update the cache per <xref target='CacheUpdateException'/>.  A PBX has no human to verify the SAS, so the PBX assumes the cache should be updated unless a pbxsecret mismatch suggests otherwise.  Note that unenrolled phones will lose cache sync after an attempted MiTM attack, because the PBX will update the cache during the attack. </t>
+<t>
+However, this loss of cache sync for an unenrolled phone may be easily remedied by calling an enrolled phone behind the PBX (with the PBX acting as a MiTM) and re-verifying the SAS with a human.  That would update the cache on both the unenrolled phone and the PBX, re-establishing cache sync. </t>
+<t>
+The PBX's lack of human assisted SAS verification following a cache mismatch is one more reason to reduce the PBX's MiTM role whenever possible, as explained in <xref target='PBXdirect'/>. </t>
+
 </section>
 
 </section>
@@ -917,12 +939,12 @@ Because no key agreement has been reached, the Error message cannot use the same
 <t>
 The GoClear message (<xref target='GoClearMsg'/>) is used to switch from SRTP to RTP, usually because the user has chosen to do that by pressing a button.  The GoClear uses a MAC of the Message Type Block sent in the GoClear message computed with the mackey derived from the shared secret.  This MAC is truncated to the leftmost 64 bits.  When sent by the initiator: </t>
 <figure><artwork>
-   clear_mac = MAC(mackeyi, "GoClear ") 
+  clear_mac = MAC(mackeyi, "GoClear ") 
 </artwork></figure>
 <t>
 When sent by the responder: </t>
 <figure><artwork>
-   clear_mac = MAC(mackeyr, "GoClear ") 
+  clear_mac = MAC(mackeyr, "GoClear ") 
 </artwork></figure>
 <t>
 Both of these MACs are calculated across the 8-octet "GoClear " Message Type Block, including the trailing space. </t>
@@ -948,8 +970,8 @@ All SRTP session key material MUST be erased by the receiver of the GoClear mess
 <t>
 All key material that would have been erased at the end of the SIP session MUST be erased, as described in <xref target='keydestruct2'/>, with the single exception of ZRTPSess.  In this case, ZRTPSess is destroyed in a manner different from the other key material.  Both parties replace ZRTPSess with a KDF-derived non-invertible function of itself: </t>
 <figure><artwork>
-   ZRTPSess = KDF(ZRTPSess, "New ZRTP Session", (ZIDi || ZIDr), 
-                    negotiated hash length) 
+  ZRTPSess = KDF(ZRTPSess, "New ZRTP Session", 
+                 (ZIDi || ZIDr), negotiated hash length) 
 </artwork></figure>
 <t>
 ZRTPSess will be replaced twice if a session generates separate GoClear messages for both audio and video streams, and the two endpoints need not carry out the replacements in the same order. </t>
@@ -1004,6 +1026,8 @@ If the ZRTP exchange is Multistream mode, the field in the Confirm1 and Confirm2
 The expiration interval need not be used to force the deletion of a shared secret from the cache when the interval has expired.  It just means the shared secret MAY be deleted from that cache at any point after the interval has expired without causing the other party to note it as an unexpected security event when the next key negotiation occurs between the same two parties.  This means there need not be perfectly synchronized deletion of expired secrets from the two caches, and makes it easy to avoid a race condition that might otherwise be caused by clock skew. </t>
 <t>
 If the expiration interval is not properly agreed to by both endpoints, it may later result in false alarms of MiTM attacks, due to apparent <xref target='cache_mismatch'>cache mismatches</xref>. </t>
+<t>
+It is essential that each cache entry have some form of human-readable name associated with it.  If cache entries are stored without human-readable names, a MiTM attack is possible for an attacker who has previously established cache entries with both parties, as explained in <xref target='ZID2AOR'/>.  Users would have to do a verbal SAS compare for every call, greatly diminishing the value of caching. </t>
 <t>
 The relationship between a ZID and a SIP AOR is explained in <xref target='ZID2AOR'/>. </t>
 
@@ -1077,42 +1101,42 @@ ZRTP uses this ASCII encoding to simplify debugging and make it "Wireshark (Ethe
 Currently, 16 Message Type Blocks are defined -- they represent the set of ZRTP message primitives.  ZRTP endpoints MUST support the Hello, HelloACK, Commit, DHPart1, DHPart2, Confirm1, Confirm2, Conf2ACK, SASrelay, RelayACK, Error, ErrorACK, and PingACK message types.  ZRTP endpoints MAY support the GoClear, ClearACK, and Ping messages.  In order to generate a PingACK message, it is necessary to parse a Ping message.  Additional messages may be defined in extensions to ZRTP. </t>
 
 <figure><artwork>
-Message Type Block   |  Meaning 
---------------------------------------------------- 
-"Hello   "           |  Hello Message
----------------------------------------------------
-"HelloACK"           |  HelloACK Message 
---------------------------------------------------- 
-"Commit  "           |  Commit Message 
----------------------------------------------------
-"DHPart1 "           |  DHPart1 Message
----------------------------------------------------
-"DHPart2 "           |  DHPart2 Message 
----------------------------------------------------
-"Confirm1"           |  Confirm1 Message
----------------------------------------------------
-"Confirm2"           |  Confirm2 Message 
----------------------------------------------------
-"Conf2ACK"           |  Conf2ACK Message 
----------------------------------------------------
-"Error   "           |  Error Message 
----------------------------------------------------
-"ErrorACK"           |  ErrorACK Message 
----------------------------------------------------
-"GoClear "           |  GoClear Message 
----------------------------------------------------
-"ClearACK"           |  ClearACK Message 
----------------------------------------------------
-"SASrelay"           |  SASrelay Message 
----------------------------------------------------
-"RelayACK"           |  RelayACK Message 
----------------------------------------------------
-"Ping    "           |  Ping Message 
----------------------------------------------------
-"PingACK "           |  PingACK Message 
----------------------------------------------------
-
-Table 1. Message Type Block Values
+  Message Type Block   |  Meaning 
+  ----------------------------------------------
+  "Hello   "           |  Hello Message
+  ----------------------------------------------
+  "HelloACK"           |  HelloACK Message
+  ----------------------------------------------
+  "Commit  "           |  Commit Message
+  ----------------------------------------------
+  "DHPart1 "           |  DHPart1 Message
+  ----------------------------------------------
+  "DHPart2 "           |  DHPart2 Message
+  ----------------------------------------------
+  "Confirm1"           |  Confirm1 Message
+  ----------------------------------------------
+  "Confirm2"           |  Confirm2 Message
+  ----------------------------------------------
+  "Conf2ACK"           |  Conf2ACK Message
+  ----------------------------------------------
+  "Error   "           |  Error Message
+  ----------------------------------------------
+  "ErrorACK"           |  ErrorACK Message
+  ----------------------------------------------
+  "GoClear "           |  GoClear Message
+  ----------------------------------------------
+  "ClearACK"           |  ClearACK Message
+  ----------------------------------------------
+  "SASrelay"           |  SASrelay Message
+  ----------------------------------------------
+  "RelayACK"           |  RelayACK Message
+  ----------------------------------------------
+  "Ping    "           |  Ping Message
+  ----------------------------------------------
+  "PingACK "           |  PingACK Message
+  ----------------------------------------------
+  
+  Table 1. Message Type Block Values
 </artwork></figure>
 
 </section>
@@ -1126,18 +1150,18 @@ All ZRTP endpoints MUST support a Hash Type of SHA-256 <xref target="FIPS-180-3"
 The choice of the negotiated Hash Type is coupled to the Key Agreement Type, as explained in <xref target="KeyAgreementType"/>. </t>
 
 <figure><artwork>
-Hash Type Block | Meaning
-----------------------------------------------------------
-"S256"          | SHA-256 Hash defined in FIPS 180-3
-----------------------------------------------------------
-"S384"          | SHA-384 Hash defined in FIPS 180-3
-----------------------------------------------------------
-"N256"          | NIST SHA-3 256-bit hash (when published)
-----------------------------------------------------------
-"N384"          | NIST SHA-3 384-bit hash (when published)
-----------------------------------------------------------
-
-Table 2. Hash Type Block Values
+  Hash Type Block | Meaning
+  ----------------------------------------------------------
+  "S256"          | SHA-256 Hash defined in FIPS 180-3
+  ----------------------------------------------------------
+  "S384"          | SHA-384 Hash defined in FIPS 180-3
+  ----------------------------------------------------------
+  "N256"          | NIST SHA-3 256-bit hash (when published)
+  ----------------------------------------------------------
+  "N384"          | NIST SHA-3 384-bit hash (when published)
+  ----------------------------------------------------------
+  
+  Table 2. Hash Type Block Values
 </artwork></figure>
 
 <t>
@@ -1183,32 +1207,32 @@ The block cipher algorithm is negotiated via the Cipher Type Block found in the 
 <t>
 All ZRTP endpoints MUST support AES-128 (AES1) and MAY support AES-192 (AES2), AES-256 (AES3), or other Cipher Types.  The Advanced Encryption Standard is defined in <xref target="FIPS-197"/>. </t>
 <t>
-The use of AES-128 in SRTP is defined by <xref target="RFC3711"/>. The use of AES-192 and AES-256 in SRTP is defined by <xref target='RFC6188'/>.  The choice of the AES key length is coupled to the Key Agreement Type, as explained in <xref target="KeyAgreementType"/>. </t>
+The use of AES-128 in SRTP is defined by <xref target="RFC3711"/>. The use of AES-192 and AES-256 in SRTP is defined by <xref target='RFC6188'/>.  All ZRTP endpoints must support AES in counter mode for SRTP.  The choice of the AES key length is coupled to the Key Agreement Type, as explained in <xref target="KeyAgreementType"/>. </t>
 <t>
 Other block ciphers may be supported that have the same block size and key sizes as AES.  If implemented, they may be used anywhere in ZRTP or SRTP in place of the AES, in the same modes of operation and key size.  Notably, in counter mode to replace AES-CM in <xref target="RFC3711"/> and <xref target='RFC6188'/>, as well as in CFB mode to encrypt a portion of the <xref target='Confirm_Msg'>Confirm message</xref> and <xref target='SASrelay_Msg'>SASrelay message</xref>.  ZRTP endpoints MAY support the <xref target="TwoFish">TwoFish</xref> block cipher. </t>
 
 <figure><artwork>
- Cipher Type Block  |  Meaning
-------------------------------------------------- 
-"AES1"              |  AES with 128-bit keys
--------------------------------------------------
-"AES2"              |  AES with 192-bit keys       
--------------------------------------------------
-"AES3"              |  AES with 256-bit keys
--------------------------------------------------
-"2FS1"              |  TwoFish with 128-bit keys
--------------------------------------------------
-"2FS2"              |  TwoFish with 192-bit keys
--------------------------------------------------
-"2FS3"              |  TwoFish with 256-bit keys
--------------------------------------------------
-
-Table 3. Cipher Type Block Values
+   Cipher Type Block  |  Meaning
+  -------------------------------------------------
+  "AES1"              |  AES with 128-bit keys
+  -------------------------------------------------
+  "AES2"              |  AES with 192-bit keys
+  -------------------------------------------------
+  "AES3"              |  AES with 256-bit keys
+  -------------------------------------------------
+  "2FS1"              |  TwoFish with 128-bit keys
+  -------------------------------------------------
+  "2FS2"              |  TwoFish with 192-bit keys
+  -------------------------------------------------
+  "2FS3"              |  TwoFish with 256-bit keys
+  -------------------------------------------------
+  
+  Table 3. Cipher Type Block Values
 </artwork></figure>
 <!-- If we ever add Camellia (RFC3713), add these types:
-"CAM1"   Camellia with 128 bit keys
-"CAM2"   Camellia with 192 bit keys
-"CAM3"   Camellia with 256 bit keys
+  "CAM1"   Camellia with 128-bit keys
+  "CAM2"   Camellia with 192-bit keys
+  "CAM3"   Camellia with 256-bit keys
 -->
 </section>
 
@@ -1219,26 +1243,28 @@ All ZRTP endpoints MUST support HMAC-SHA1 authentication tags for SRTP, with bot
 ZRTP endpoints MAY support 32-bit and 64-bit SRTP authentication tags based on the <xref target="Skein">Skein hash function</xref>.  The Skein-512-MAC key length is fixed at 256 bits for this application, and the output length is adjustable.  The Skein MAC is defined in Sections 2.6 and 4.3 of <xref target="Skein"/> and is not based on the HMAC construct.  Reference implementations for Skein may be found at <xref target="Skein1"/>.  A Skein-based MAC is significantly more efficient than HMAC-SHA1, especially for short SRTP payloads. </t>
 <t>
 The Skein MAC key is computed by the SRTP key derivation function, which is also referred to as the AES-CM PRF, or pseudorandom function.  This is defined either in <xref target="RFC3711"/> or in <xref target='RFC6188'/>, depending on the selected SRTP AES key length.  To compute a Skein MAC key, the SRTP PRF output for the authentication key is left untruncated at 256 bits, instead of the usual truncated length of 160 bits (the key length used by HMAC-SHA1). </t>
+<t>
+In <xref target="RFC3711"/>, Section 9.5 prohibits the use of 32-bit auth tags for SRTCP, regardless of the SRTP auth tag length.  Accordingly, if Skein is used for SRTP auth tags, SRTCP MUST use Skein 64-bit auth tags, regardless of the negotiated SRTP auth tag length. </t>
 
 <figure><artwork>
-Auth Tag Type Block  |  Meaning
-----------------------------------------------------------
-"HS32"               |  32-bit authentication tag based on
-                     |  HMAC-SHA1 as defined in RFC 3711.
-----------------------------------------------------------
-"HS80"               |  80-bit authentication tag based on
-                     |  HMAC-SHA1 as defined in RFC 3711.
-----------------------------------------------------------
-"SK32"               |  32-bit authentication tag based on
-                     |  Skein-512-MAC as defined in [Skein],
-                     |  with 256-bit key, 32-bit MAC length.
-----------------------------------------------------------
-"SK64"               |  64-bit authentication tag based on
-                     |  Skein-512-MAC as defined in [Skein],
-                     |  with 256-bit key, 64-bit MAC length.
-----------------------------------------------------------
-
-Table 4. Auth Tag Type Values
+  Auth Tag Type Block  |  Meaning
+  ----------------------------------------------------------
+  "HS32"               |  32-bit authentication tag based on
+                       |  HMAC-SHA1 as defined in RFC 3711.
+  ----------------------------------------------------------
+  "HS80"               |  80-bit authentication tag based on
+                       |  HMAC-SHA1 as defined in RFC 3711.
+  ----------------------------------------------------------
+  "SK32"               |  32-bit authentication tag based on
+                       |  Skein-512-MAC as defined in [Skein],
+                       |  with 256-bit key, 32-bit MAC length.
+  ----------------------------------------------------------
+  "SK64"               |  64-bit authentication tag based on
+                       |  Skein-512-MAC as defined in [Skein],
+                       |  with 256-bit key, 64-bit MAC length.
+  ----------------------------------------------------------
+  
+  Table 4. Auth Tag Type Values
 </artwork></figure>
 
 <t>
@@ -1270,31 +1296,31 @@ The table below lists the pv length in words and DHPart1 and DHPart2 message len
 </t>
 
 <figure><artwork>
-Key Agreement |  pv   | message | Meaning
-Type Block    | words |  words  | 
------------------------------------------------------------
-"DH3k"        |   96  |   117   |  DH mode with p=3072 bit prime 
-              |       |         |  per RFC 3526, Section 4.
------------------------------------------------------------
-"DH2k"        |   64  |    85   |  DH mode with p=2048 bit prime 
-              |       |         |  per RFC 3526, Section 3.
------------------------------------------------------------
-"EC25"        |   16  |    37   |  Elliptic Curve DH, P-256
-              |       |         |  per RFC 5114, Section 2.6
------------------------------------------------------------
-"EC38"        |   24  |    45   |  Elliptic Curve DH, P-384
-              |       |         |  per RFC 5114, Section 2.7
------------------------------------------------------------
-"EC52"        |   33  |    54   |  Elliptic Curve DH, P-521
-              |       |         |  per RFC 5114, Section 2.8
-              |       |         |  (deprecated - do not use)
------------------------------------------------------------
-"Prsh"        |    -  |     -   |  Preshared Non-DH mode
------------------------------------------------------------
-"Mult"        |    -  |     -   |  Multistream Non-DH mode
------------------------------------------------------------
-
-Table 5. Key Agreement Type Block Values
+  Key Agreement |  pv   | message | Meaning
+  Type Block    | words |  words  | 
+  -----------------------------------------------------------
+  "DH3k"        |   96  |   117   |  DH mode with p=3072 bit prime 
+                |       |         |  per RFC 3526, Section 4.
+  -----------------------------------------------------------
+  "DH2k"        |   64  |    85   |  DH mode with p=2048 bit prime 
+                |       |         |  per RFC 3526, Section 3.
+  -----------------------------------------------------------
+  "EC25"        |   16  |    37   |  Elliptic Curve DH, P-256
+                |       |         |  per RFC 5114, Section 2.6
+  -----------------------------------------------------------
+  "EC38"        |   24  |    45   |  Elliptic Curve DH, P-384
+                |       |         |  per RFC 5114, Section 2.7
+  -----------------------------------------------------------
+  "EC52"        |   33  |    54   |  Elliptic Curve DH, P-521
+                |       |         |  per RFC 5114, Section 2.8
+                |       |         |  (deprecated - do not use)
+  -----------------------------------------------------------
+  "Prsh"        |    -  |     -   |  Preshared Non-DH mode
+  -----------------------------------------------------------
+  "Mult"        |    -  |     -   |  Multistream Non-DH mode
+  -----------------------------------------------------------
+  
+  Table 5. Key Agreement Type Block Values
 </artwork></figure>
 
 </section>
@@ -1306,16 +1332,16 @@ The SAS Type determines how the SAS is rendered to the user so that the user may
 All ZRTP endpoints MUST support the base32 and MAY support the base256 rendering schemes for the Short Authentication String, and other SAS rendering schemes.  See <xref target='DerivingZRTPSess'/> for how the sasvalue is computed and <xref target='SAS'/> for how the SAS is used. </t>
 
 <figure><artwork>
- SAS Type Block   |  Meaning
----------------------------------------------------
- "B32 "           |  Short Authentication String using
-                  |  base32 encoding
----------------------------------------------------
- "B256"           |  Short Authentication String using
-                  |  base256 encoding (PGP Word List)
----------------------------------------------------
-
-Table 6. SAS Type Block Values 
+  SAS Type Block |  Meaning
+  --------------------------------------------------
+  "B32 "         |  Short Authentication String using
+                 |  base32 encoding
+  --------------------------------------------------
+  "B256"         |  Short Authentication String using
+                 |  base256 encoding (PGP Word List)
+  --------------------------------------------------
+  
+  Table 6. SAS Type Block Values 
 </artwork></figure>
 
 <t>
@@ -1349,17 +1375,17 @@ This base32 encoding scheme differs from RFC 4648, and was designed (by Bryce Wi
 The Signature Type Block specifies what signature algorithm is used to sign the SAS as discussed in <xref target="SignSAS"/>.  The 4-octet Signature Type Block, along with the accompanying signature block, are OPTIONAL and may be present in the <xref target="Confirm_Msg">Confirm message</xref> or the <xref target="SASrelay_Msg">SASrelay message</xref>.  The signature types are given in the table below. </t>
 
 <figure><artwork>
-Signature   | Meaning
-Type Block  |
-------------------------------------------------
-"PGP "      | OpenPGP Signature, per RFC 4880
-            | 
-------------------------------------------------
-"X509"      | ECDSA, with X.509v3 cert
-            | per RFC 5759 and FIPS-186-3
-------------------------------------------------
-
-Table 7. Signature Type Block Values 
+  Signature   | Meaning
+  Type Block  |
+  ---------------------------------------------
+  "PGP "      | OpenPGP Signature, per RFC 4880
+              |
+  ---------------------------------------------
+  "X509"      | ECDSA, with X.509v3 cert
+              | per RFC 5759 and FIPS-186-3
+  ---------------------------------------------
+  
+  Table 7. Signature Type Block Values 
 </artwork></figure>
 
 <t>
@@ -1468,120 +1494,120 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 
 
 <figure anchor='DHCommit_Msg' title="DH Commit Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=29 words        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="Commit  " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                   Hash image H2 (8 words)                     |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                         ZID  (3 words)                        |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       hash algorithm                          |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                      cipher algorithm                         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       auth tag type                           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     Key Agreement Type                        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         SAS Type                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                       hvi (8 words)                           |
-   |                           . . .                               |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         MAC (2 words)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=29 words        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="Commit  " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                   Hash image H2 (8 words)                     |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                         ZID  (3 words)                        |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       hash algorithm                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                      cipher algorithm                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       auth tag type                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     Key Agreement Type                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         SAS Type                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                       hvi (8 words)                           |
+|                           . . .                               |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 <figure anchor='MultCommit_Msg' title="Multistream Commit Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=25 words        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="Commit  " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                   Hash image H2 (8 words)                     |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                         ZID  (3 words)                        |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       hash algorithm                          |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                      cipher algorithm                         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       auth tag type                           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                  Key Agreement Type = "Mult"                  |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         SAS Type                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                       nonce (4 words)                         |
-   |                           . . .                               |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         MAC (2 words)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=25 words        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="Commit  " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                   Hash image H2 (8 words)                     |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                         ZID  (3 words)                        |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       hash algorithm                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                      cipher algorithm                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       auth tag type                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                  Key Agreement Type = "Mult"                  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         SAS Type                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                       nonce (4 words)                         |
+|                           . . .                               |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 <figure anchor='PrshCommit_Msg' title="Preshared Commit Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=27 words        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="Commit  " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                   Hash image H2 (8 words)                     |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                         ZID  (3 words)                        |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       hash algorithm                          |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                      cipher algorithm                         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       auth tag type                           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                   Key Agreement Type = "Prsh"                 |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         SAS Type                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                       nonce (4 words)                         |
-   |                           . . .                               |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        keyID (2 words)                        |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         MAC (2 words)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=27 words        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="Commit  " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                   Hash image H2 (8 words)                     |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                         ZID  (3 words)                        |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       hash algorithm                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                      cipher algorithm                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       auth tag type                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                   Key Agreement Type = "Prsh"                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         SAS Type                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                       nonce (4 words)                         |
+|                           . . .                               |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        keyID (2 words)                        |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 
@@ -1599,39 +1625,39 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 
 
 <figure anchor='DHPart1_Msg' title="DHPart1 Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|   length=depends on KA Type   |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="DHPart1 " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                   Hash image H1 (8 words)                     |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        rs1IDr (2 words)                       |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        rs2IDr (2 words)                       |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     auxsecretIDr (2 words)                    |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     pbxsecretIDr (2 words)                    |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                  pvr (length depends on KA Type)              |
-   |                               . . .                           |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         MAC (2 words)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|   length=depends on KA Type   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="DHPart1 " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                   Hash image H1 (8 words)                     |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        rs1IDr (2 words)                       |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        rs2IDr (2 words)                       |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     auxsecretIDr (2 words)                    |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     pbxsecretIDr (2 words)                    |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                  pvr (length depends on KA Type)              |
+|                               . . .                           |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1647,39 +1673,39 @@ The next four parameters are non-invertible hashes (computed in <xref target='Sh
 The 64-bit MAC at the end of the message is computed across the whole message, not including the MAC, using the MAC algorithm defined in <xref target='ImplicitHash'/>.  The MAC key is the sender's H0 (defined in <xref target='Hashchains'/>), and thus the MAC cannot be checked by the receiving party until the sender's H0 value is known to the receiving party later in the protocol. </t>
 
 <figure anchor='DHPart2_Msg' title="DHPart2 Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|   length=depends on KA Type   |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="DHPart2 " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                   Hash image H1 (8 words)                     |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        rs1IDi (2 words)                       |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        rs2IDi (2 words)                       |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     auxsecretIDi (2 words)                    |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     pbxsecretIDi (2 words)                    |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                  pvi (length depends on KA Type)              |
-   |                               . . .                           |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         MAC (2 words)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|   length=depends on KA Type   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="DHPart2 " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                   Hash image H1 (8 words)                     |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        rs1IDi (2 words)                       |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        rs2IDi (2 words)                       |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     auxsecretIDi (2 words)                    |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     pbxsecretIDi (2 words)                    |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                  pvi (length depends on KA Type)              |
+|                               . . .                           |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1703,39 +1729,39 @@ If the signature length (in words) is non-zero, a signature type block will be p
 The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator uses the zrtpkeyi to encrypt the Confirm2 message. </t>
 
 <figure anchor='Confirm_Msg' title="Confirm1 and Confirm2 Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |      Message Type Block="Confirm1" or "Confirm2" (2 words)    |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     confirm_mac (2 words)                     |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                CFB Initialization Vector (4 words)            |
-   |                                                               |
-   |                                                               |
-   +===============================================================+
-   |                                                               |
-   |                  Hash preimage H0 (8 words)                   |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   | Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|E|V|A|D| 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              cache expiration interval (1 word)               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |      optional signature type block (1 word if present)        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |           optional signature block (variable length)          |
-   |                            . . .                              |
-   |                                                               |
-   |                                                               |
-   +===============================================================+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      Message Type Block="Confirm1" or "Confirm2" (2 words)    |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     confirm_mac (2 words)                     |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                CFB Initialization Vector (4 words)            |
+|                                                               |
+|                                                               |
++===============================================================+
+|                                                               |
+|                  Hash preimage H0 (8 words)                   |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|E|V|A|D| 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              cache expiration interval (1 word)               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      optional signature type block (1 word if present)        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|           optional signature block (variable length)          |
+|                            . . .                              |
+|                                                               |
+|                                                               |
++===============================================================+
 </artwork></figure>
 
 </section>
@@ -1745,15 +1771,14 @@ The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator 
 The Conf2ACK message is sent by the Responder in response to a valid Confirm2 message.  The message format for the Conf2ACK is shown in the figure below.  The receipt of a Conf2ACK stops retransmission of the Confirm2 message.  Note that the first SRTP media (with a valid SRTP auth tag) from the responder also stops retransmission of the Confirm2 message. </t>
 
 <figure anchor='Conf2ACK_Msg' title="Conf2ACK Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=3 words        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="Conf2ACK" (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=3 words        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="Conf2ACK" (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1763,66 +1788,66 @@ The Conf2ACK message is sent by the Responder in response to a valid Confirm2 me
 The Error message is sent to terminate an in-process ZRTP key agreement exchange due to an error.  The format is shown in the figure below.  The use of the Error message is described in <xref target='ErrorTermination'/>. </t>
 
 <figure anchor='Error_Msg' title="Error Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=4 words         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="Error   " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |               Integer Error Code (1 word)                     |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=4 words         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="Error   " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|               Integer Error Code (1 word)                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 <t>
 Defined hexadecimal values for the Error Code are listed in the table below. </t>
 
 <figure><artwork>
-Error Code |  Meaning
------------------------------------------------------------
- 0x10      | Malformed packet (CRC OK, but wrong structure)
------------------------------------------------------------
- 0x20      | Critical software error
------------------------------------------------------------
- 0x30      | Unsupported ZRTP version
------------------------------------------------------------
- 0x40      | Hello components mismatch
------------------------------------------------------------
- 0x51      | Hash Type not supported
------------------------------------------------------------
- 0x52      | Cipher Type not supported
------------------------------------------------------------
- 0x53      | Public key exchange not supported
------------------------------------------------------------
- 0x54      | SRTP auth tag not supported
------------------------------------------------------------
- 0x55      | SAS rendering scheme not supported
------------------------------------------------------------
- 0x56      | No shared secret available, DH mode required
------------------------------------------------------------
- 0x61      | DH Error: bad pvi or pvr ( == 1, 0, or p-1)
------------------------------------------------------------
- 0x62      | DH Error: hvi != hashed data
------------------------------------------------------------
- 0x63      | Received relayed SAS from untrusted MiTM
------------------------------------------------------------
- 0x70      | Auth Error: Bad Confirm pkt MAC
------------------------------------------------------------
- 0x80      | Nonce reuse
------------------------------------------------------------
- 0x90      | Equal ZIDs in Hello
------------------------------------------------------------
- 0x91      | SSRC collision
------------------------------------------------------------
- 0xA0      | Service unavailable
------------------------------------------------------------
- 0xB0      | Protocol timeout error
------------------------------------------------------------
- 0x100     | GoClear message received, but not allowed
------------------------------------------------------------
-
-Table 8. ZRTP Error Codes
+  Error Code |  Meaning
+  -----------------------------------------------------------
+   0x10      | Malformed packet (CRC OK, but wrong structure)
+  -----------------------------------------------------------
+   0x20      | Critical software error
+  -----------------------------------------------------------
+   0x30      | Unsupported ZRTP version
+  -----------------------------------------------------------
+   0x40      | Hello components mismatch
+  -----------------------------------------------------------
+   0x51      | Hash Type not supported
+  -----------------------------------------------------------
+   0x52      | Cipher Type not supported
+  -----------------------------------------------------------
+   0x53      | Public key exchange not supported
+  -----------------------------------------------------------
+   0x54      | SRTP auth tag not supported
+  -----------------------------------------------------------
+   0x55      | SAS rendering scheme not supported
+  -----------------------------------------------------------
+   0x56      | No shared secret available, DH mode required
+  -----------------------------------------------------------
+   0x61      | DH Error: bad pvi or pvr ( == 1, 0, or p-1)
+  -----------------------------------------------------------
+   0x62      | DH Error: hvi != hashed data
+  -----------------------------------------------------------
+   0x63      | Received relayed SAS from untrusted MiTM
+  -----------------------------------------------------------
+   0x70      | Auth Error: Bad Confirm pkt MAC
+  -----------------------------------------------------------
+   0x80      | Nonce reuse
+  -----------------------------------------------------------
+   0x90      | Equal ZIDs in Hello
+  -----------------------------------------------------------
+   0x91      | SSRC collision
+  -----------------------------------------------------------
+   0xA0      | Service unavailable
+  -----------------------------------------------------------
+   0xB0      | Protocol timeout error
+  -----------------------------------------------------------
+   0x100     | GoClear message received, but not allowed
+  -----------------------------------------------------------
+  
+  Table 8. ZRTP Error Codes
 </artwork></figure>
 
 </section>
@@ -1833,14 +1858,14 @@ Table 8. ZRTP Error Codes
 The ErrorACK message is sent in response to an Error message.  The receipt of an ErrorACK stops retransmission of the Error message.  The format is shown in the figure below. </t>
 
 <figure anchor='ErrorAck_Msg' title="ErrorACK Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=3 words         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="ErrorACK" (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=3 words         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="ErrorACK" (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1851,17 +1876,17 @@ The ErrorACK message is sent in response to an Error message.  The receipt of an
 Support for the GoClear message is OPTIONAL in the protocol, and it is sent to switch from SRTP to RTP.  The format is shown in the figure below.  The clear_mac is used to authenticate the GoClear message so that bogus GoClear messages introduced by an attacker can be detected and discarded.  The use of GoClear is described in <xref target='GoClearTermination'/>. </t>
 
 <figure anchor='GoClear_Msg' title="GoClear Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=5 words         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="GoClear " (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       clear_mac (2 words)                     |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=5 words         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="GoClear " (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       clear_mac (2 words)                     |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1872,14 +1897,14 @@ Support for the GoClear message is OPTIONAL in the protocol, and it is sent to s
 Support for the ClearACK message is OPTIONAL in the protocol, and it is sent to acknowledge receipt of a GoClear.  A ClearACK is only sent if the clear_mac from the GoClear message is authenticated.  Otherwise, no response is returned.  The format is shown in the figure below. </t>
 
 <figure anchor='ClearAck_Msg' title="ClearACK Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=3 words         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="ClearACK" (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=3 words         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="ClearACK" (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1899,6 +1924,8 @@ The next 9 bits contain the signature length.  The trusted MiTM MAY compute a di
 <t>
 The next 8 bits are used for flags.  Undefined flags are set to zero and ignored. Three flags are currently defined.  The Disclosure Flag (D) is a Boolean bit defined in <xref target='DisclosureFlag'/>. The Allow Clear flag (A) is a Boolean bit defined in <xref target='GoClearTermination'/>.  The SAS Verified flag (V) is a Boolean bit defined in <xref target='SASVerifiedFlag'/>. These flags are updated values to the same flags provided earlier in the Confirm message, but they are updated to reflect the new flag information relayed by the PBX from the other party. </t>
 <t>
+The relayed V flag comes from the ZRTP endpoint on the other side of the PBX.  If this relayed V flag is zero, the local ZRTP user agent should render a conspicuous display of the SAS to prompt the human to verbally verify it.  However, a relayed V flag should not affect the local V flag, unlike the V flag received in the Confirm message. </t>
+<t>
 The next 32-bit word contains the SAS rendering scheme for the relayed sashash, which will be the same rendering scheme used by the other party on the other side of the trusted MiTM. <xref target='RelayingTheSAS'/> describes how the PBX determines whether the ZRTP client regards the PBX as a trusted MiTM. If the PBX determines that the ZRTP client trusts the PBX, the next 8 words contain the sashash relayed from the other party.  The first 32-bit word of the sashash contains the sasvalue, which may be rendered to the user using the specified SAS rendering scheme.  If this SASrelay message is being sent to a ZRTP client that does not trust this MiTM, the sashash will be ignored by the recipient and should be set to zeros by the PBX. </t>
 <t>
 If the signature length (in words) is non-zero, a signature type block will be present along with a signature block.  Next, there is the signature block.  The signature block includes the signature and the key (or a link to the key) used to generate the signature (<xref target="SignSAS"/>). </t>
@@ -1908,39 +1935,39 @@ If the signature length (in words) is non-zero, a signature type block will be p
 Depending on whether the trusted MiTM had taken the role of the initiator or the responder during the ZRTP key negotiation, the SASrelay message is encrypted with zrtpkeyi or zrtpkeyr. </t>
 
 <figure anchor='SASrelay_Msg' title="SASrelay Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |             Message Type Block="SASrelay" (2 words)           |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                         MAC (2 words)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                CFB Initialization Vector (4 words)            |
-   |                                                               |
-   |                                                               |
-   +===============================================================+
-   | Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|0|V|A|D| 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |           rendering scheme of relayed SAS (1 word)            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |            Trusted MiTM relayed sashash (8 words)             |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |      optional signature type block (1 word if present)        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |           optional signature block (variable length)          |
-   |                            . . .                              |
-   |                                                               |
-   |                                                               |
-   +===============================================================+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Message Type Block="SASrelay" (2 words)           |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                CFB Initialization Vector (4 words)            |
+|                                                               |
+|                                                               |
++===============================================================+
+| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|0|V|A|D| 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           rendering scheme of relayed SAS (1 word)            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|            Trusted MiTM relayed sashash (8 words)             |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      optional signature type block (1 word if present)        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|           optional signature block (variable length)          |
+|                            . . .                              |
+|                                                               |
+|                                                               |
++===============================================================+
 </artwork></figure>
 
 </section>
@@ -1950,14 +1977,14 @@ Depending on whether the trusted MiTM had taken the role of the initiator or the
 The RelayACK message is sent in response to a valid SASrelay message.  The message format for the RelayACK is shown in the figure below.  The receipt of a RelayACK stops retransmission of the SASrelay message. </t>
 
 <figure anchor='RelayACK_Msg' title="RelayACK Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=3 words        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |              Message Type Block="RelayACK" (2 words)          |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=3 words        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              Message Type Block="RelayACK" (2 words)          |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1977,20 +2004,30 @@ The Ping message (<xref target='Ping_Msg'/>) contains an "EndpointHash", defined
 The Ping message contains a version number that defines what version of PingACK is requested.  If that version number is supported by the Ping responder, a PingACK with a format that matches that version will be received.  Otherwise, a PingACK with a lower version number may be received. </t>
 
 <figure anchor='Ping_Msg' title="Ping Message Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=6 words         |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |             Message Type Block="Ping    " (2 words)           |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                   version="1.10" (1 word)                     |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                    EndpointHash (2 words)                     |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=6 words         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Message Type Block="Ping    " (2 words)           |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                   version="1.10" (1 word)                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    EndpointHash (2 words)                     |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
+
+
+<section anchor='WhyPing' title="Rationale for Ping messages">
+
+<t>
+Ping messages are useful for implementing ZRTP proxies.  A <xref target="IntermediaryZRTP">ZRTP proxy</xref> is a "bump-in-the-wire" that sits between a (usually non-ZRTP-enabled) VoIP client and the Internet.  It attempts to secure the VoIP call by examining the RTP media streams, detecting the call, and intervening to encrypt the call "on the fly". </t>
+<t>
+This is not always easy to do, as it may have to be done without help from the signaling layer.  The VoIP client may make internal decisions on how to do NAT traversal, which are not readily apparent to the proxy.  The proxy has to reverse engineer this knowledge by inspecting all the RTP streams.  The RTP stream from Alice to Bob might not follow the same path, through the same ports, as the RTP stream from Bob to Alice.  One stream may go directly peer to peer, while the reverse stream may take a detour through a media relay.  The two parties may have both audio and video streams between them, and may also be simultaneously talking to others in a conference call, and some of those parties may be behind the same PBX.  All of these RTP streams have to be sorted out and associated with the correct ZRTP endpoints.  Related audio and video streams have to be matched up between two parties, and not confused with other streams to nearby parties behind the same PBX.  Ping and PingACK messages make this possible. </t>
+
+</section>
 
 
 </section>
@@ -2002,11 +2039,11 @@ A PingACK message is sent only in response to a Ping.  A ZRTP endpoint MUST resp
 <t>
 The PingACK message carries its own 64-bit EndpointHash, distinct from the EndpointHash of the other party's Ping message.  It is REQUIRED that it be highly improbable for two participants in a call to have the same EndpointHash and that an EndpointHash maintains a persistent value between calls.  For a normal ZRTP endpoint, such as a ZRTP-enabled VoIP client, the EndpointHash can be just the truncated ZID.  For a ZRTP endpoint such as a PBX that has multiple endpoints behind it, the EndpointHash must be a distinct value for each endpoint behind it.  It is recommended that the EndpointHash be a truncated hash of the ZID of the ZRTP endpoint concatenated with something unique about the actual endpoint or phone behind the PBX.  This may be the SIP URI of the phone, the PBX extension number, or the local IP address of the phone, whichever is more readily available in the application environment: </t>
 <figure><artwork>
-   EndpointHash = hash(ZID || SIP URI of the endpoint) 
+  EndpointHash = hash(ZID || SIP URI of the endpoint) 
 
-   EndpointHash = hash(ZID || PBX extension number of the endpoint) 
+  EndpointHash = hash(ZID || PBX extension number of the endpoint) 
 
-   EndpointHash = hash(ZID || local IP address of the endpoint) 
+  EndpointHash = hash(ZID || local IP address of the endpoint) 
 </artwork></figure>
 <t>
 Any of these formulae confer uniqueness for the simple case of terminating the ZRTP connection at the VoIP client, or the more complex case of a PBX terminating the ZRTP connection for multiple VoIP phones in a conference call, all sharing the PBX's ZID, but with separate IP addresses behind the PBX.  There is no requirement for the same hash function to be used by both parties. </t>
@@ -2015,25 +2052,24 @@ The PingACK message contains the EndpointHash of the sender of the PingACK as we
 </t>
 
 <figure anchor='PingACK_Msg' title="PingACK Message Format"><artwork>
-   0                   1                   2                   3
-   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=9 words         |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  |             Message Type Block="PingACK " (2 words)           |
-  |                                                               |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  |                   version="1.10" (1 word)                     |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  |           EndpointHash of PingACK Sender (2 words)            |
-  |                                                               |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  |            EndpointHash of Received Ping (2 words)            |
-  |                                                               |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  |       Source Identifier (SSRC) of Received Ping (1 word)      |
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|        length=9 words         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Message Type Block="PingACK " (2 words)           |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                   version="1.10" (1 word)                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           EndpointHash of PingACK Sender (2 words)            |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            EndpointHash of Received Ping (2 words)            |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|       Source Identifier (SSRC) of Received Ping (1 word)      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -2062,17 +2098,17 @@ The GoClear, Error, and SASrelay messages may be initiated and retransmitted by 
 Non-Hello (and non-Ping) ZRTP messages are retransmitted at an interval that starts at T2 seconds and doubles after every retransmission, capping at 1200 ms.  T2 has a recommended initial value of 150 ms.  Each non-Hello message is retransmitted 10 times before giving up, which means the entire retry schedule is exhausted after 9.45 seconds (150 + 300 + 600 + 7*1200 ms).  Only the initiator performs retransmissions.  Each message has a response message that stops retransmissions, as shown in the table below.  The higher values of T2 means that retransmissions will likely occur only in the event of packet loss. </t>
 
 <figure><artwork>
-   Message      Acknowledgement Message
-   -------      -----------------------
-   Hello        HelloACK or Commit
-   Commit       DHPart1 or Confirm1
-   DHPart2      Confirm1
-   Confirm2     Conf2ACK or SRTP media
-   GoClear      ClearACK
-   Error        ErrorACK
-   SASrelay     RelayACK
-   Ping         PingACK
-
+  Message      Acknowledgement Message
+  -------      -----------------------
+  Hello        HelloACK or Commit
+  Commit       DHPart1 or Confirm1
+  DHPart2      Confirm1
+  Confirm2     Conf2ACK or SRTP media
+  GoClear      ClearACK
+  Error        ErrorACK
+  SASrelay     RelayACK
+  Ping         PingACK
+  
   Table 9. Retransmitted ZRTP Messages and Responses 
 </artwork></figure>
 
@@ -2113,7 +2149,7 @@ The SAS Verified flag (V) is set based on the user indicating that SAS compariso
 <t>
 Regardless of whether there is a user interface element to allow the user to set the SAS Verified flag, it is worth caching a shared secret, because doing so reduces opportunities for an attacker in the next call. </t>
 <t>
-If at any time the users carry out the SAS comparison procedure, and it actually fails to match, then this means there is a very resourceful MiTM.  If this is the first call, the MiTM was there on the first call, which is impressive enough.  If it happens in a later call, it also means the MiTM must also know the cached shared secret, because you could not have carried out any voice traffic at all unless the session key was correctly computed and is also known to the attacker.  This implies the MiTM must have been present in all the previous sessions, since the initial establishment of the first shared secret.  This is indeed a resourceful attacker.  It also means that if at any time he ceases his participation as a MiTM on one of your calls, the protocol will detect that the cached shared secret is no longer valid -- because it was really two different shared secrets all along, one of them between Alice and the attacker, and the other between the attacker and Bob.  The continuity of the cached shared secrets makes it possible for us to detect the MiTM when he inserts himself into the ongoing relationship, as well as when he leaves.   Also, if the attacker tries to stay with a long lineage of calls, but fails to execute a DH MiTM attack for even one missed call, he is permanently excluded.  He can no longer resynchronize with the chain of cached shared secrets. </t>
+If at any time the users carry out the SAS comparison procedure, and it actually fails to match, then this indicates a very resourceful MiTM.  If the SAS comparison fails on the very first call, that would indicate an attacker who had some foresight, agility, and fortuitous positioning, but he is still caught by the SAS comparison.  If the MiTM misses the first call and attacks later, this will trigger a cache mismatch alarm.  If the SAS fails to match without a cache mismatch alarm, it means the MiTM knows the cached shared secret.  This either implies the MiTM attacker has somehow stolen the cached shared secret from one of the two parties, or it implies the MiTM must have been present in all the previous sessions, since the initial establishment of the first shared secret.  This is indeed a resourceful attacker.  It also means that if at any time he ceases his participation as a MiTM on one of the calls, the protocol will detect that the cached shared secret is no longer valid -- because it was really two different shared secrets all along, one of them between Alice and the attacker, and the other between the attacker and Bob.  The continuity of the cached shared secrets makes it possible to detect the MiTM when he inserts himself into the ongoing relationship, as well as when he leaves.   Also, if the attacker tries to stay with a long lineage of calls, but fails to execute a DH MiTM attack for even one missed call, he is permanently excluded.  He can no longer resynchronize with the chain of cached shared secrets.  This is discussed further in <xref target='selfhealing'/>. </t>
 <t>
 A user interface element (i.e., a checkbox or button) is needed to allow the user to tell the software the SAS verify was successful, causing the software to set the SAS Verified flag (V), which (together with our cached shared secret) obviates the need to perform the SAS procedure in the next call.  An additional user interface element can be provided to let the user tell the software he detected an actual SAS mismatch, which indicates a MiTM attack.  The software can then take appropriate action, clearing the SAS Verified flag, and erase the cached shared secret from this session.  It is up to the implementer to decide if this added user interface complexity is warranted. </t>
 <t>
@@ -2132,7 +2168,7 @@ To avoid unnecessary signature calculations, a signature SHOULD NOT be sent if t
 <t>
 Note that the choice of hash algorithm used in the digital signature is independent of the hash used in the sashash.  The sashash is determined by the negotiated <xref target="HashTypeBlock">Hash Type</xref>, while the hash used by the digital signature is separately defined by the digital signature algorithm.  For example, the sashash may be based on SHA-256, while the digital signature might use SHA-384, if an ECDSA P-384 key is used. </t>
 <t>
-If the sashash (which is always truncated to 256 bits) is shorter than the signature hash, the security is not weakened because the hash commitment precludes the attacker from searching for sashash collisions. </t>
+If the sashash (which is always truncated to 256 bits) is shorter than the signature hash, the security is not weakened because the hash commitment precludes the attacker from searching for sashash collisions, as explained in <xref target="HashCommit"/>. </t>
 <t>
 ECDSA algorithms may be used with either OpenPGP-formatted keys, or X.509v3 certificates.  If the ZRTP key exchange is ECDH, and the SAS is signed, then the signature SHOULD be ECDSA, and SHOULD use the same size curve as the ECDH exchange if an ECDSA key of that size is available. </t>
 <t>
@@ -2150,11 +2186,12 @@ All signatures generated MUST use only NIST-approved hash algorithms, and MUST a
 <t>
 If the <xref target="SignatureType">SAS Signature Type</xref> specifies an OpenPGP signature ("PGP "), the signature-related fields are arranged as follows. </t>
 <t>
-The first field after the 4-octet Signature Type Block is the OpenPGP signature.  The format of this signature and the algorithms that create it are specified by <xref target="RFC4880"/>.  The signature is comprised of a complete OpenPGP version 4 signature in binary form (not Radix-64), as specified in RFC 4880, Section 5.2.3, enclosed in the full OpenPGP packet syntax.  The length of the OpenPGP signature is parseable from the signature, and depends on the type and length of the signing key. </t>
+The first field after the 4-octet Signature Type Block is the OpenPGP signature.  The format of this signature and the algorithms that create it are specified by <xref target="RFC4880"/> and <xref target="RFC6637"/>.  The signature is comprised of a complete OpenPGP version 4 signature in binary form (not Radix-64), as specified in RFC 4880, Section 5.2.3, enclosed in the full OpenPGP packet syntax.  The length of the OpenPGP signature is parseable from the signature, and depends on the type and length of the signing key. </t>
 <t>
-If OpenPGP signatures are supported, an implementation SHOULD NOT generate signatures using any other signature algorithm except DSA or ECDSA (ECDSA is a reserved algorithm type in RFC 4880), but MAY accept other signature types from the other party.  DSA signatures with keys shorter than 2048 bits or longer than 3072 bits MUST NOT be generated. </t>
+If OpenPGP signatures are supported, an implementation SHOULD NOT generate signatures using any other signature algorithm except DSA or ECDSA (ECDSA in OpenPGP is defined in <xref target="RFC6637"/>), but MAY accept other signature types from the other party.  DSA signatures with keys shorter than 2048 bits or longer than 3072 bits MUST NOT be generated. </t>
 <t>
-Implementers should be aware that ECDSA signatures for OpenPGP are expected to become available when the work in progress <xref target="ECC-OpenPGP"/> becomes an RFC.  Any use of ECDSA signatures in ZRTP SHOULD NOT generate signatures using ECDSA key sizes other than P-224, P-256, and P-384, as defined in <xref target="FIPS-186-3"/>. </t>
+<!-- Implementers should be aware that ECDSA signatures for OpenPGP are expected to become available when the work in progress <xref target="ECC-OpenPGP"/> becomes an RFC. --> 
+Any use of ECDSA signatures in ZRTP SHOULD NOT generate signatures using ECDSA key sizes other than P-224, P-256, and P-384, as defined in <xref target="FIPS-186-3"/>. </t>
 <t>
 RFC 4880, Section 5.2.3.18, specifies a way to embed, in an OpenPGP signature, a URI of the preferred key server.  The URI should be fully specified to obtain the public key of the signing key that created the signature.  This URI MUST be present.  It is up to the recipient of the signature to obtain the public key of the signing key and determine its validity status using the OpenPGP trust model discussed in <xref target="RFC4880"/>. </t>
 <t>
@@ -2163,17 +2200,17 @@ The contents of <xref target="OpenPGP-Signature"/> lie inside the encrypted regi
 The total length of all the material in <xref target="OpenPGP-Signature"/>, including the key server URI, must not exceed 511 32-bit words (2044 octets).  This length, in words, is stored in the signature length field in the Confirm or SASrelay message containing the signature.  It is desirable to avoid UDP fragmentation, so the URI should be kept short. </t>
 
 <figure anchor='OpenPGP-Signature' title="OpenPGP Signature Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |             Signature Type Block = "PGP " (1 word)            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                       OpenPGP signature                       |
-   |                       (variable length)                       |
-   |                             . . .                             |
-   |                                                               |
-   +===============================================================+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|             Signature Type Block = "PGP " (1 word)            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                       OpenPGP signature                       |
+|                       (variable length)                       |
+|                             . . .                             |
+|                                                               |
++===============================================================+
 </artwork></figure>
 
 </section>
@@ -2193,23 +2230,23 @@ It is up to the recipient of the signature to use information in the certificate
 The total length of all the material in <xref target="X509-Signature"/>, including the X.509v3 certificate, must not exceed 511 32-bit words (2044 octets).  This length, in words, is stored in the signature length field in the Confirm or SASrelay message containing the signature.  It is desirable to avoid UDP fragmentation, so the certificate material should be kept to a much smaller size than this.  End user certs issued for this purpose should minimize the size of extraneous material such as legal notices. </t>
 
 <figure anchor='X509-Signature' title="X.509v3 ECDSA Signature Format"><artwork>
-    0                   1                   2                   3 
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-   |             Signature Type Block = "X509" (1 word)            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                Signing key's X.509v3 certificate              |
-   |                        (variable length)                      |
-   |                             . . .                             |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                ECDSA P-256 or P-384 signature                 |
-   |                    (16 words or 24 words)                     |
-   |                             . . .                             |
-   |                                                               |
-   +===============================================================+
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|             Signature Type Block = "X509" (1 word)            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                Signing key's X.509v3 certificate              |
+|                        (variable length)                      |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                ECDSA P-256 or P-384 signature                 |
+|                    (16 words or 24 words)                     |
+|                             . . .                             |
+|                                                               |
++===============================================================+
 </artwork></figure>
 
 </section>
@@ -2250,13 +2287,15 @@ Note: In the case of a PBX sharing trusted MiTM keys with both endpoints, it doe
 <t>
 The relayed SAS fields contain the SAS rendering type and the complete sashash.  The receiver absolutely MUST NOT render the relayed SAS if it does not come from a specially trusted ZRTP endpoint.  The security of the ZRTP protocol depends on not rendering a relayed SAS from an untrusted MiTM, because it may be relayed by a MiTM attacker.  See the SASrelay message definition (<xref target='SASrelay_Msg'/>) for further details. </t>
 <t>
-To ensure that both Alice and Bob will use the same SAS rendering scheme after the keys are negotiated, the PBX also sends the SASrelay message to the unenrolled party (which does not regard this PBX as a trusted MiTM), conveying the SAS rendering scheme, but not the sashash, which it sets to zero.  The unenrolled party will ignore the relayed SAS field, but will use the specified SAS rendering scheme. </t>
+To ensure that both Alice and Bob will use the same SAS rendering scheme after the keys are negotiated, the PBX also sends the SASrelay message to the unenrolled party (which does not regard this PBX as a trusted MiTM), conveying the SAS rendering scheme, but not the sashash, which it sets to zero.  The unenrolled party will ignore the relayed SAS field, but will use the specified SAS rendering scheme.  If both endpoints are enrolled, one of them will still receive an "empty" SASrelay message.  If and only if a PBX relays an SAS to one endpoint, it MUST also send an "empty" SASrelay to the other endpoint, containing a null sashash. </t>
 <t>
-It is possible to route a call through two ZRTP-enabled PBXs using this scheme.  Assume Alice is a ZRTP endpoint who trusts her local PBX in Atlanta, and Bob is a ZRTP endpoint who trusts his local PBX in Biloxi.  The call is routed from Alice to the Atlanta PBX to the Biloxi PBX to Bob.  Atlanta would relay the Atlanta-Biloxi SAS to Alice because Alice is enrolled with Atlanta, and Biloxi would relay the Atlanta-Biloxi SAS to Bob because Bob is enrolled with Biloxi.  The two PBXs are not assumed to be enrolled with each other in this example.  Both Alice and Bob would view and verbally compare the same relayed SAS, the Atlanta-Biloxi SAS.  No more than two trusted MiTM nodes can be traversed with this relaying scheme.  This behavior is extended to two PBXs that are enrolled with each other, via this rule:  In the case of a PBX sharing trusted MiTM keys with both endpoints (i.e., both enrolled with this PBX), one of which is another PBX (evidenced by the M-flag) and one of which is a non-PBX, the MiTM PBX must always relay the PBX-to-PBX SAS to the non-PBX endpoint. </t>
+It is possible to route a call through two ZRTP-enabled PBXs using this scheme.  Assume Alice is a ZRTP endpoint who trusts her local PBX in Atlanta, and Bob is a ZRTP endpoint who trusts his local PBX in Biloxi.  The call is routed from Alice to the Atlanta PBX to the Biloxi PBX to Bob.  Atlanta would relay the Atlanta-Biloxi SAS to Alice because Alice is enrolled with Atlanta, and Biloxi would relay the Atlanta-Biloxi SAS to Bob because Bob is enrolled with Biloxi.  The two PBXs are not assumed to be enrolled with each other in this example.  Both Alice and Bob would view and verbally compare the same relayed SAS, the Atlanta-Biloxi SAS.  No more than two trusted MiTM nodes can be traversed with this relaying scheme.  This behavior is extended to two PBXs that are enrolled with each other, via this rule:  In the case of a PBX sharing trusted MiTM keys with both endpoints (i.e., both enrolled with this PBX), one of which is another PBX (evidenced by the M-flag) and one of which is a non-PBX, the MiTM PBX MUST always relay the PBX-to-PBX SAS to the non-PBX endpoint. </t>
 <t>
 A ZRTP endpoint phone that trusts a PBX to act as a trusted MiTM is effectively delegating its own policy decisions of algorithm negotiation to the PBX. </t>
 <t>
 When a PBX is between two ZRTP endpoints and is terminating their media streams at the PBX, the PBX presents its own ZID to the two parties, eclipsing the ZIDs of the two parties from each other.  For example, if several different calls are routed through such a PBX to several different ZRTP-enabled phones behind the PBX, only a single ZID is presented to the calling party in every case -- the ZID of the PBX itself. </t>
+<t>
+This SAS relay mechanism imposes a cognitive burden on the user, and the number of intermediaries does not scale up beyond two PBXs trusted by their respective local users.  The ZRTP ecosystem becomes more elegant if all PBXs and other media intermediaries avoid the MiTM role whenever possible, as explained in <xref target='PBXdirect'/>. </t>
 <t>
 The next section describes the initial enrollment procedure that establishes a special shared secret, a trusted MiTM key, between a PBX and a phone, so that the phone will learn to recognize the PBX as a trusted MiTM. </t>
 
@@ -2264,7 +2303,8 @@ The next section describes the initial enrollment procedure that establishes a s
 <t>
 Both the PBX and the endpoint need to know when enrollment is taking place.  One way of doing this is to set up an enrollment extension on the PBX that a newly configured endpoint would call and establish a ZRTP session.  The PBX would then play audio media that offers the user an opportunity to configure his phone to trust this PBX as a trusted MiTM.  The PBX calculates and stores the trusted MiTM shared secret in its cache and associates it with this phone, indexed by the phone's ZID.  The trusted MiTM PBX shared secret is derived from ZRTPSess via the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref> in this manner: </t>
 <figure><artwork>
-   pbxsecret = KDF(ZRTPSess, "Trusted MiTM key", (ZIDi || ZIDr), 256) 
+  pbxsecret = KDF(ZRTPSess, "Trusted MiTM key", 
+                  (ZIDi || ZIDr), 256) 
 </artwork></figure>
 <t>
 The pbxsecret is calculated for the whole ZRTP session, not for each stream within a session, thus the KDF Context field in this case does not include any stream-specific nonce material. </t>
@@ -2286,7 +2326,43 @@ There are more streamlined methods to configure ZRTP user agents to trust a PBX.
 <t>
 It is recommended that a ZRTP client not proceed with the PBX enrollment procedure without evidence that a MiTM attack is not taking place during the enrollment session.  It would be especially damaging if a MiTM tricks the client into enrolling with the wrong PBX.  That would enable the malevolent MiTM to wiretap all future calls without arousing suspicion, because he would appear to be trusted. </t>
 
+
+<t>
+To this end, the client ZRTP endpoint should not proceed with PBX enrollment unless at least one of the following conditions apply: </t>
+
+<t><list style="symbols">
+<t>
+An automated mechanism is used, from <xref target='AutomatedAuthentication'/>. TLS-protected signaling may be especially well-suited in this special case, for reasons explained in <xref target='LeveragingIntegrityProtectedSIP'/>. </t>
+<t>
+The SAS is verified with a live human on the PBX side during the enrollment session. </t>
+<t>
+It is the judgement of the administrator supervising the enrollment that the threat model and the circumstances indicate a low probability of a MiTM being present, perhaps because this is the first call to the PBX, or because the enrollment is conducted over a relatively safe network. For example, a mobile smart phone can be enrolled through a protected WiFi local network near the PBX, before issuing it to an employee for international travel. This leap of faith is usually justified in benign environments. </t>
+</list></t>
+
 </section>
+
+</section>
+
+
+<section anchor='AutomatedAuthentication' title="Automated Methods of Authenticating the DH Exchange">
+
+<t>
+Alternate methods of authenticating the DH exchange may be used when interacting with an automated remote system, when no human is available at the remote endpoint to verbally compare the SAS.  Usage scenarios include leaving or retrieving voicemail, interacting with a conference bridge, or the <xref target='PBXenrollment'>PBX security enrollment procedure</xref>. </t>
+<t>
+Here are the automated ways to have ZRTP authenticate the DH exchange: </t>
+
+<t><list style="symbols">
+<t>
+Successful use of the mechanism described in <xref target='LeveragingIntegrityProtectedSIP'/>, but only if fully supported by end-to-end integrity-protected delivery of the a=zrtp-hash in the signaling.  This might be achieved via <xref target="RFC4474"/> or better still, Dan Wing's <xref target='SIP-IDENTITY'>SIP Identity using Media Path</xref>.  This allows authentication of the DH exchange without human assistance.  However, in most usage scenarios that access an automated system, the entire end-to-end path is comprised of only one hop, so TLS provides sufficient integrity protection in this special case.  This is explained in detail in <xref target='LeveragingIntegrityProtectedSIP'/>. </t>
+<t>
+The SAS was previously verified with the remote system in an earlier session, evidenced by the <xref target='SASVerifiedFlag'>SAS verified flag (V)</xref> at both ends and a matching cache entry.  If circumstances permit this method, it has the advantage of not requiring a PKI. </t>
+<t>
+A good signature is received and verified using the digital signature feature on the SAS hash, as described in <xref target='SignSAS'/>, if this feature is supported. Note that for PBX enrollment, only the PBX endpoint needs to supply the signature, because the trust decision is made on the client side only. </t>
+</list></t>
+<t>
+In any PKI-backed scheme, there is the disadvantage of having to decide what to do if the connection fails to authenticate because of a certificate problem.  Warning messages may not be effective because users become <xref target="Sunshine">habituated to security warnings</xref> about PKI certificates. Implementors should carefully weigh the cognitive burden on the user before they invoke such a heavyweight mechanism. ZRTP is intended to be a lightweight protocol with a low activation energy and minimal cognitive burden. </t>
+<t>
+When calling an automated system for the first time, the threat model and circumstances should be examined to decide if a PKI is the only way to protect against a MiTM.  A reasonable alternative to a PKI would be to rely on the leap of faith that a MiTM attack is less likely in the initial session, an assumption that seems to work well enough for SSH.  After the first session, cached shared secrets should suffice. </t>
 
 </section>
 
@@ -2301,19 +2377,19 @@ Note that ZRTP may be implemented without coupling with the SIP signaling.  For 
 <t>
 ZRTP endpoints that have control over the signaling path include a ZRTP SDP attributes in their SDP offers and answers.  The ZRTP attribute, a=zrtp-hash, is used to indicate support for ZRTP and to convey a hash of the Hello message.  The hash is computed according to <xref target='Binding2Signaling'/>. </t>
 <t>
-Aside from the advantages described in <xref target='Binding2Signaling'/>, there are a number of potential uses for this attribute.  It is useful when signaling elements would like to know when ZRTP may be utilized by endpoints.  It is also useful if endpoints support multiple methods of SRTP key management.  The ZRTP attribute can be used to ensure that these key management approaches work together instead of against each other.  For example, if only one endpoint supports ZRTP, but both support another method to key SRTP, then the other method will be used instead.  When used in parallel, an SRTP secret carried in an a=keymgt <xref target='RFC4567'/> or a=crypto <xref target='RFC4568'/> attribute can be used as a shared secret for the srtps computation defined in <xref target='derive_srtps'/>.  The ZRTP attribute is also used to signal to an intermediary ZRTP device not to act as a ZRTP endpoint, as discussed in <xref target='IntermediaryZRTP'/>. </t>
+Aside from the advantages described in <xref target='Binding2Signaling'/>, there are a number of potential uses for this attribute.  It is useful when signaling elements would like to know when ZRTP may be utilized by endpoints.  It is also useful if endpoints support multiple methods of SRTP key management.  The ZRTP attribute can be used to ensure that these key management approaches work together instead of against each other.  For example, if only one endpoint supports ZRTP, but both support another method to key SRTP, then the other method will be used instead.  <!-- When used in parallel, an SRTP secret carried in an a=keymgt <xref target='RFC4567'/> or a=crypto <xref target='RFC4568'/> attribute can be used as a shared secret for the auxsecret computation defined in <xref target='derive_auxsecret_from_sdes'/>.--> When the a=crypto <xref target='RFC4568'/> attribute and the a=zrtp-hash attribute are both used in parallel, the media can transition from SDES-keyed SRTP to ZRTP-keyed SRTP, as described in <xref target='zrtp_with_sdes'/>.  The ZRTP attribute is also used to signal to an intermediary ZRTP device not to act as a ZRTP endpoint, as discussed in <xref target='IntermediaryZRTP'/> and <xref target='PBXdirect'/>. </t>
 <t>
-The a=zrtp-hash attribute can only be included in the SDP at the media level since Hello messages sent in different media streams will have unique hashes. </t>
+The a=zrtp-hash attribute can only be included in the SDP at the media level since Hello messages sent in different media streams will have unique hashes.  A separate a=zrtp-hash attribute should be included for each media stream.  Both ZRTP endpoints should provide a=zrtp-hash attributes in their SDP. </t>
 
 <t>
 The ABNF for the ZRTP attribute is as follows: </t>
 
 <figure><artwork>
-    zrtp-attribute   = "a=zrtp-hash:" zrtp-version zrtp-hash-value
+  zrtp-attribute   = "a=zrtp-hash:" zrtp-version zrtp-hash-value
 
-    zrtp-version     = token
+  zrtp-version     = token
 
-    zrtp-hash-value  = 1*(HEXDIG)
+  zrtp-hash-value  = 1*(HEXDIG)
 </artwork></figure>
 
 <t>
@@ -2372,7 +2448,9 @@ The <xref target="RFC5479">Media Security Requirements </xref> R-EXISTING requir
 <t>
 Without an end-to-end integrity-protection mechanism in the signaling layer to guarantee delivery of the a=zrtp-hash SDP attribute without modification by a third party, these MACs alone will not prevent a MiTM attack.  In that case, ZRTP's built-in SAS mechanism will still have to be used to authenticate the key exchange.  At the time of this writing, very few deployed VoIP clients offer a fully implemented SIP stack that provides end-to-end integrity protection for the delivery of SDP attributes.  Also, end-to-end signaling integrity becomes more problematic if <xref target='RFC3824'>E.164 numbers</xref> are used in SIP.  Thus, real-world implementations of ZRTP endpoints will continue to depend on SAS authentication for quite some time.  Even after there is widespread availability of SIP user agents that offer integrity protected delivery of SDP attributes, many users will still be faced with the fact that the signaling path may be controlled by institutions that do not have the best interests of the end user in mind.  In those cases, SAS authentication will remain the gold standard for the prudent user. </t>
 <t>
-Even without SIP integrity protection, the <xref target="RFC5479">Media Security Requirements </xref> R-ACT-ACT requirement can be met by ZRTP's SAS mechanism.  Although ZRTP may benefit from an integrity-protected SIP layer, it is fortunate that ZRTP's self-contained MiTM defenses do not actually require an integrity-protected SIP layer. ZRTP can bypass the delays and problems that SIP integrity faces, such as E.164 number usage, and the complexity of building and maintaining a PKI. </t>
+The SIP layer can obtain hop-wise integrity protection simply by using <xref target='RFC5246'>TLS</xref>, but this does not achieve full end-to-end integrity protection of the a=zrtp-hash attribute in the multi-hop general case.  However, if the entire end-to-end signaling path is comprised of only one hop, TLS is good enough, provided the associated PKI complexity can be contained.  This usually covers the use cases where a client is traversing one TLS hop to access the automated remote services of its own PBX, where no human is available to verbally compare the SAS.  Examples include leaving or retrieving voicemail, interacting with an IVR or conference bridge, or performing the <xref target='PBXenrollment'>PBX security enrollment procedure</xref>.  Note that the risk of trusting the SIP server or PBX becomes moot when the PBX itself is the intended ZRTP endpoint.  Thus, TLS-protected signaling is recommended and preferred for these special use cases.  TLS-protected signaling is usually justified for its own separate reasons, to mitigate exposure to traffic analysis, which means the signaling layer already would have borne the additional cost of TLS. </t>
+<t>
+Even without SIP end-to-end integrity protection, the <xref target="RFC5479">Media Security Requirements </xref> R-ACT-ACT requirement can be met by ZRTP's SAS mechanism.  Although ZRTP may benefit from an integrity-protected SIP layer, it is fortunate that ZRTP's self-contained MiTM defenses do not actually require an integrity-protected SIP layer. ZRTP can bypass the delays and problems that SIP integrity faces, such as E.164 number usage, and the complexity of building and maintaining a PKI. </t>
 <t>
 In contrast, <xref target="RFC5764">DTLS-SRTP</xref> appears to depend heavily on end-to-end integrity protection in the SIP layer.  Further, DTLS-SRTP must bear the additional cost of a signature calculation of its own, in addition to the signature calculation the SIP layer uses to achieve its integrity protection.  ZRTP needs no signature calculation of its own to leverage the signature calculation carried out in the SIP layer. </t>
 
@@ -2380,19 +2458,54 @@ In contrast, <xref target="RFC5764">DTLS-SRTP</xref> appears to depend heavily o
 
 </section>
 
-<section anchor='derive_srtps' title="Deriving the SRTP Secret (srtps) from the Signaling Layer">
+<section anchor='zrtp_with_sdes' title="Combining ZRTP With SDES">
 <t>
-The shared secret calculations defined in <xref target='SharedSecretDetermination'/> make use of the SRTP secret (srtps), if it is provided by the signaling layer. </t>
+The signaling layer may negotiate its own SRTP master key and salt, using the SDP Security Descriptions (<xref target="RFC4568">SDES</xref>) or <xref target='RFC4567'/>.  This section describes how ZRTP may be used in combination with SDES. </t>
 <t>
-It is desirable for only one SRTP key negotiation protocol to be used, and that protocol should be ZRTP.  But in the event the signaling layer negotiates its own SRTP master key and salt, using the SDP Security Descriptions (<xref target="RFC4568">SDES</xref>) or <xref target='RFC4567'/>, it can be passed from the signaling to the ZRTP layer and mixed into ZRTP's own shared secret calculations, without compromising security by creating a dependency on the signaling for media encryption. </t>
+Most ZRTP endpoints are expected to use <xref target='RFC5246'>TLS</xref> to protect the signaling layer, just because it's a good idea to hide the signaling from eavesdroppers who want to see who you are calling.  If TLS is used for the signaling, SDES incurs no additional cost in packets or computation. </t>
 <t>
-ZRTP computes srtps from the SRTP master key and salt parameters provided by the signaling layer in this manner, truncating the result to 256 bits: </t>
+However, SDES has significant security vulnerabilities if used alone.  Because the SDES keying material is known to the SIP server, SDES is vulnerable to any SIP server controlled by a wiretapper.  For that reason, SDES must be regarded as a "wiretap-friendly" protocol.  ZRTP does not reveal key material to the signaling layer.  Further, most TLS cipher suites found in the wild lack perfect forward secrecy (PFS), so SDES would inherit that deficiency.  Nonetheless, it is useful against other threat models, and can complement ZRTP's strengths. </t>
+<t>
+ZRTP's signaling component, the a=zrtp-hash attribute, is not adversely affected by a TLS cipher suite that lacks perfect forward secrecy.  Also, if SDES is combined with ZRTP, any lack of PFS in TLS becomes unexploitable for the traffic that comes after the ZRTP exchange. </t>
+<t>
+The advantages of combining SDES with ZRTP:
+<list>
+<t>
+Protects both early media and real media that precedes a ZRTP exchange.  For example, the first few packets of video may expose sensitive information before a ZRTP exchange completes. </t>
+<t>
+If ZRTP fails for any reason, for example if an opponent blocks it in the media layer, the media remains protected by SDES-keyed SRTP, in a degraded fail-safe mode. </t>
+</list></t>
+<t>
+If and only if the signaling layer in both directions has both SDES and a properly computed a=zrtp-hash attribute, the SRTP stack MUST, upon completion of the ZRTP exchange, replace its keying from SDES-provided key material to ZRTP-provided key material.  In this case, both ZRTP endpoints MUST clear the Allow Clear flag (A) in their respective <xref target='Confirm_Msg'>Confirm messages</xref>, which disables the <xref target='GoClearTermination'>GoClear mechanism</xref>.  Also in this case, ZRTP MAY include imported SDES key material via auxsecret, as described in <xref target='derive_auxsecret_from_sdes'/>. </t>
+<t>
+If either endpoint fails to explicitly provide the a=zrtp-hash attribute in the signaling, a ZRTP exchange in the media layer would perform no such rekeying of SRTP, and no importation of SDES keying material into ZRTP.  In this case, the SDES-keyed SRTP media is treated as if it were RTP, and a second independent SRTP context is established by ZRTP, resulting in the media passing through two layers of SRTP encryption, with the inner layer keyed by SDES, and the outer layer keyed by ZRTP.  This relatively inefficient scenario is expected to be rare, and applies mainly to "bump-in-the-wire" <xref target="IntermediaryZRTP">ZRTP proxies</xref> that have no access to the signaling layer, such as <xref target="Zfone"/>. </t>
+
+<section anchor='derive_auxsecret_from_sdes' title="Deriving auxsecret from SDES Key Material">
+<t>
+The shared secret calculations defined in <xref target='SharedSecretDetermination'/> make use of the auxsecret, which may be optionally provided by various out-of-band sources.  In this section, we show how auxsecret may be derived from <xref target="RFC4568">SDES</xref> keying information that may be present in the signaling layer. </t>
+<t>
+If only one SRTP key negotiation protocol is to be used, that protocol should be ZRTP.  But in the event the signaling layer negotiates its own SRTP master key and salt, using the SDP Security Descriptions (<xref target="RFC4568">SDES</xref>) or <xref target='RFC4567'/>, it can be passed from the signaling to the ZRTP layer and mixed into ZRTP's own shared secret calculations, without compromising security by creating a dependency on the signaling for media encryption.  ZRTP endpoints may make use of SDES parameters from any signaling protocol that provides it. </t>
+<t>
+If SDES is used in the signaling layer, there are two separate SRTP master keys and salts provided by SDES, one for each direction of media flow.  These two keys and salts are combined here into a single shared secret, auxsecret, to feed into the mix of ZRTP shared secret calculations. </t>
 <figure><artwork>
-   srtps = KDF(SRTP master key, "SRTP Secret", (ZIDi || ZIDr ||
-                 SRTP master salt), 256) 
+  auxsecret = KDF(hash(len(srtpmki) || srtpmki || 
+                       len(srtpmkr) || srtpmkr), 
+              "SRTP Secret", 
+              (ZIDi || ZIDr || 
+              srtpmsi || srtpmsr),
+              negotiated hash length)
 </artwork></figure>
 <t>
-It is expected that the srtps parameter will be rarely computed or used in typical ZRTP endpoints, because it is likely and desirable that ZRTP will be the sole means of negotiating SRTP keys, needing no help from <xref target="RFC4568"/> or <xref target='RFC4567'/>. If srtps is computed, it will be stored in the auxiliary shared secret auxsecret, defined in <xref target='SharedSecretDetermination'/> and used in <xref target='SharedSecretHashesCalc'/>. </t>
+In the above formula, the parameters srtpmki and srtpmsi are extracted from the SDES transmitted in the signaling by the SIP initiator, while srtpmkr and srtpmsr are extracted from the SDES transmitted in the signaling by the SIP responder.  These keys and salts are in binary form, not the base64 representation used by SDES.  The explicit length fields, len(), in the above hash are 32-bit big-endian integers, giving the length in octets of the field that follows.  The length in octets of srtpmki or srtpmkr can only be 16, 24, or 32, if the AES is used.  srtpmki is the SIP initiator's SRTP master key, srtpmkr is the SIP responder's SRTP master key, srtpmsi is the SIP initiator's SRTP master salt, and srtpmsr is the SIP responder's SRTP master salt.  The length of the SRTP master salts are defined as 112 bits in <xref target="RFC3711"/>.  ZIDi is the ZRTP initiator's ZID, and ZIDr is the ZRTP responder's ZID. </t>
+<t>
+This mechanism only provides a way to import the associated SDES keying material from the first media stream in a ZRTP exchange.  Any additional media stream would be keyed by ZRTP's <xref target='Multistream2'>Multistream mode</xref>, and thus would not import any additional SDES keying material associated with the additional media stream. </t>
+<t>
+The inclusion of SDES keying material is optional for a ZRTP endpoint.  Even if only one endpoint computes auxsecret from the SDES material, ZRTP protocol completion is still possible if security policy permits a non-matching auxsecret, as can be seen in <xref target='SharedSecretDetermination'/>.  SDES key material MUST NOT be imported into ZRTP except in circumstances defined in <xref target='zrtp_with_sdes'/>, when the a=zrtp-hash attribute is also present in the signaling. </t>
+<t>
+<!-- Because the SDES keying material is known to the SIP server, it is of questionable value for any threat model that involves a SIP server controlled by a wiretapper.  -->
+There are no security enhancements conferred by importing SDES material into ZRTP, that are not already conferred by using the a=zrtp-hash attribute.  Both enhance security only if the SIP server is trustworthy.  For this reason, this section may be deprecated in future versions of this specification. </t>
+
+</section>
 
 </section>
 
@@ -2404,7 +2517,7 @@ When voice is compressed with a VBR codec, the packet lengths vary depending on 
 <t>
 It also appears that voice activity detection (VAD) leaks information about the content of the conversation, but to a lesser extent than VBR.  This effect can be mitigated by lengthening the VAD hangover time by a random amount between 1 and 2 seconds, if this is feasible in your application.  Only short bursts of speech would benefit from lengthening the VAD hangover time. </t>
 <t>
-The security problems of VBR and VAD are addressed in detail by the guidelines in <xref target='VBR-AUDIO'/>.  It is RECOMMENDED that ZRTP endpoints follow these guidelines. </t>
+The security problems of VBR and VAD are addressed in detail by the guidelines in <xref target='RFC6562'/>.  It is RECOMMENDED that ZRTP endpoints follow these guidelines. </t>
 
 </section>
 
@@ -2416,13 +2529,13 @@ An attacker who is not in the media path may attempt to inject false ZRTP protoc
 <t>
 A lot of work has been done on the analysis of denial-of-service attacks, especially from attackers who are not in the media path.  Such an attacker might inject false ZRTP packets to force a ZRTP endpoint to engage in an endless series of pointless and expensive DH calculations.  To detect and reject false packets cheaply and rapidly as soon as they are received, ZRTP uses a one-way hash chain, which is a series of successive hash images.  Before each session, the following values are computed: </t>
 <figure><artwork>
-   H0 = 256-bit random nonce (different for each party) 
+  H0 = 256-bit random nonce (different for each party) 
 
-   H1 = hash (H0) 
+  H1 = hash (H0) 
 
-   H2 = hash (H1) 
+  H2 = hash (H1) 
 
-   H3 = hash (H2) 
+  H3 = hash (H2) 
 </artwork></figure>
 <t>
 This one-way hash chain MUST use the hash algorithm defined in <xref target='ImplicitHash'/>, truncated to 256 bits.  Each 256-bit hash image is the preimage of the next, and the sequence of images is sent in reverse order in the ZRTP packet sequence.  The hash image H3 is sent in the Hello message, H2 is sent in the Commit message, H1 is sent in the DHPart1 or DHPart2 messages, and H0 is sent in the Confirm1 or Confirm2 messages.  The initial random H0 nonces that each party generates MUST be unpredictable to an attacker and unique within a ZRTP session, which thereby forces the derived hash images H1-H3 to also be unique and unpredictable. </t>
@@ -2456,6 +2569,37 @@ In cases where centralized media mixing is taking place, the SAS will not match 
 SIP feature tags can also be used to detect if a session is established with an automaton such as an Interactive Voice Response (IVR), voicemail system, or speech recognition system.  The display of SAS strings to users should be disabled in these cases. </t>
 <t>
 It is possible that an intermediary device acting as a ZRTP endpoint might still receive ZRTP Hello and other messages from the inside endpoint.  This could occur if there is another inline ZRTP device that does not include the ZRTP SDP attribute flag.  An intermediary acting as a ZRTP endpoint receiving ZRTP Hello and other messages from the inside endpoint MUST NOT pass these ZRTP messages. </t>
+
+<section anchor='PBXdirect' title="On Reducing PBX MiTM Behavior">
+
+<t>
+ZRTP is designed to negotiate session keys directly between two users, and to detect a man-in-the-middle (MiTM) attack.  A PBX often tries to be a MiTM, as part of its natural functionality.  This creates a conflict between the objectives of a ZRTP client and the objectives of a PBX.  This conflict may be resolved by using the <xref target='RelayingTheSAS'>trusted MiTM mechanism</xref>, but this adds complexity and only works well between users of a single trusted PBX.  It can be stretched further to handle calls between two PBXs trusted by their respective local users, but breaks down if more intermediaries are involved.  It also imposes a cognitive burden on the user, who may not be aware of the security properties or trustworthiness of all the intermediaries. </t>
+<t>
+The client usually prefers to negotiate ZRTP end-to-end with the other client, without exposing the keys or plaintext to the PBX, and use the PBX as a trusted MiTM only when necessary.  A PBX should allow this whenever possible, even if the clients trust the PBX. </t>
+<t>
+<!-- A PBX is regarded as a MiTM only if it acts as a back-to-back ZRTP MiTM between two ZRTP endpoints, negotiating ZRTP separately with each endpoint. -->
+The PBX may avoid acting as a MiTM either by allowing the media to completely bypass the PBX, with the two clients routing their media peer-to-peer, or by acting as a media relay in a manner similar to a TURN server.  The advantages of the latter approach are mainly to facilitate NAT traversal.  If only one of the two parties is a ZRTP endpoint, and the PBX is capable of serving as a ZRTP endpoint, the PBX MUST attempt to negotiate a ZRTP session with the client that supports ZRTP, so that at least one leg of the call is secure.  This is a far better choice than directly connecting the media streams between a ZRTP client and a non-ZRTP client, and having the ZRTP negotiation fail completely. </t>
+<t>
+The PBX SHOULD make best efforts to not act as a MiTM if the PBX has evidence that both VoIP clients support ZRTP.  Evidence of ZRTP support is best indicated by the presence of the optional <xref target='SignalingInteractions'>a=zrtp-hash attribute</xref> in the signaling layer of both the caller and callee.  Evidence of ZRTP support or non-support in the clients may also be available to the PBX in the form of configuration information stored in the PBX. </t>
+<t>
+If the client sends the a=zrtp-hash attribute, and the PBX acts as a MiTM nonetheless, the client SHOULD alert the user to the fact that the security level is less than expected.  The client can readily detect this condition by receiving an <xref target='SASrelay_Msg'>SASrelay message</xref> from the PBX.  The severity of the alert is left to the application, which would be relying on the trusted MiTM mechanism. </t>
+<t>
+A PBX should not act as a MiTM unless there is a compelling reason to do so.   Transcoding is fundamentally incompatible with end-to-end secure media.  It should be done only when there is no alternative, when the two ZRTP endpoints do not share a common codec.  ZRTP clients should implement a repertoire of codecs sufficient to minimize the need for PBX transcoding. <!-- Prevention of mismatched codecs can usually be achieved without unnecessary transcoding.  The PBX should not perform decoupled negotiations of codecs with each of the two clients, or add its own codecs to the mix, because that may lead to either mismatched codecs (which would cause a direct media connection to fail) or unnecessary transcoding. -->  Transcoding between two ZRTP clients forces a PBX to act as a MiTM.  If only one media stream needs transcoding in a multimedia session, all of the media streams in that session must be handled in MiTM mode.  </t>
+<t>
+If there is more than one media stream in a session between two ZRTP endpoints, a PBX MUST either act as a MiTM for all of them, or for none of them.  This is because all the media streams between two ZRTP endpoints must share the same <xref target='SAS'>SAS</xref>, due to the use of <xref target='Multistream1'>Multistream mode</xref>.  This includes the related RTCP/SRTCP streams. </t>
+<t>
+A PBX may forgo end-to-end security and choose MiTM mode for policy reasons.  An institution may choose to present a single ZRTP endpoint to the outside world, through its locally trusted PBX.  Or, a client application may explicitly request a PBX to act as a MiTM for a particular call, for example via a special dial prefix. </t>
+<t>
+It's especially harmful if a PBX that lacks its own ZRTP stack performs unnecessary transcoding between two ZRTP endpoints, ruling out the possibility of any secure connection at all.  Not even the trusted MiTM mechanism is available, because this PBX is incapable of acting as a back-to-back ZRTP MiTM.  Even if the PBX avoids transcoding, it might terminate the media streams for other reasons, reasons that are likely to be less important than the clients' need for a secure call.  If this kind of PBX sees the a=zrtp-hash attribute in the caller's signaling, and the two clients share at least one common codec, the PBX should at least attempt to do no harm, and get out of the way of ZRTP.  Let the users speak Navajo with each other if they want. </t>
+<t>
+A common usage scenario for a ZRTP-enabled PBX is for a VoIP client to call a PBX trusted by the client, in order to bridge to a PSTN gateway in or near the PBX.  In such a case, the PBX SHOULD act as a ZRTP endpoint so that the VoIP leg of the call is secured.  The call should be regarded as not secure past the ZRTP endpoint closest to the PSTN gateway.  If the PSTN gateway is distant from the PBX, the PBX should provide a secure connection to the PSTN gateway, perhaps through a VPN connection.  Even then, the call becomes vulnerable when it enters the PSTN.  Nonetheless, this would be appropriate for a caller who originates his ZRTP session from a hostile environment, but is less concerned about the wiretap threat near the PSTN gateway. </t>
+<!--
+<t>
+If the PBX knows that the distant PSTN gateway itself is also a ZRTP endpoint, the PBX may pass the call through without acting as a MiTM, resulting in a ZRTP session directly negotiated between the VoIP client and the ZRTP-enabled PSTN gateway.  However, this should be done only with a great deal of care, for several reasons.  It may impose more cognitive burden on the caller, who may or may not have had prior security associations with that particular gateway.  The PBX may randomly select from a great many PSTN gateways scattered in many countries.  Since the PBX, not the user, chooses which PSTN gateway to use, it may be better able to establish its own secure connection to the gateway.  If the end users have to establish their own ZRTP connections to each gateway, authentication becomes more complicated.  ZRTP works best when both ZRTP endpoints are physically near their respective users. </t>
+-->
+
+</section>
+
 </section>
 
 <section anchor='DisclosureFlag' title="The ZRTP Disclosure Flag" >
@@ -2500,7 +2644,9 @@ The role of the ZID in the management of the local cache of shared secrets is ex
 <t>
 Not only that, but ZRTP is independent of which signaling protocol is used.  It works equally well with SIP, Jingle, H.323, or any proprietary signaling protocol. Thus, a ZRTP ZID has little to do with SIP, per se, which means it has little to do with a SIP URI. </t>
 <t>
-Even though a ZID is associated with a device, not a human, it is often the case that a ZRTP endpoint is controlled mainly by a particular human.  For example, it may be a mobile phone.  To get the full benefit of the key continuity features, a local cache entry (and thus a ZID) should be associated with some sort of name of the remote party.  That name could be a human name, or it could be made more precise by specifying which ZRTP endpoint he's using.  For example "Jon Callas", or "Jon Callas on his iPhone", or "Jon on his iPad", or "Alice on her office phone". These name strings can be stored in the local cache, indexed by ZID, and may have been initially provided by the local user by hand.  Or the local cache entry may contain a pointer to an entry in the local address book.  When a secure session is established, if a prior session has established a cache entry, and the new session has a matching cache entry indexed by the same ZID, and the SAS has been previously verified, the person's name stored in that cache entry should be displayed. </t>
+Even though a ZID is associated with a device, not a human, it is often the case that a ZRTP endpoint is controlled mainly by a particular human.  For example, it may be a mobile phone.  For the <xref target='selfhealing'>key continuity features</xref> to be effective, a local cache entry (and thus a ZID) should be associated with some sort of name of the remote party.  That name could be a human name, or it could be made more precise by specifying which ZRTP endpoint he's using.  For example "Jon Callas", or "Jon Callas on his iPhone", or "Jon on his iPad", or "Alice on her office phone". These name strings can be stored in the local cache, indexed by ZID, and may have been initially provided by the local user by hand.  Or the local cache entry may contain a pointer to an entry in the local address book.  When a secure session is established, if a prior session has established a cache entry, and the new session has a matching cache entry indexed by the same ZID, and the SAS has been previously verified, the person's name stored in that cache entry should be displayed. </t>
+<t>
+It is absolutely essential to have these human-readable names associated with cache entries. If the cache is implemented without them, it opens the door to a simple form of MiTM attack.  An attacker who has previously established a cache entry with both parties (or simply captures a phone that has) can later act as a MiTM between those two parties without triggering a cache mismatch, which means the users will not be alerted to do an SAS compare.  This MiTM attack would be easily detected if the name stored with the cache entry is displayed for the user, so that the user can readily see that he is not connected to the remote party he expected. </t>
 <t>
 If the remote ZID originates from a PBX, the displayed name would be the name of that PBX, which might be the name of the company who owns that PBX. </t>
 <t>
@@ -2511,7 +2657,7 @@ If it is desirable to associate some key material with a particular AOR, <xref t
 
 <section title="IANA Considerations">
 <t>
-  This specification defines a new <xref target="RFC4566">SDP</xref> attribute in <xref target='SignalingInteractions'/>. </t>
+This specification defines a new <xref target="RFC4566">SDP</xref> attribute in <xref target='SignalingInteractions'/>. </t>
 
 <figure><artwork><![CDATA[
   Contact name:          Philip Zimmermann <prz@mit.edu>
@@ -2522,9 +2668,10 @@ If it is desirable to associate some key material with a particular AOR, <xref t
 
   Subject to charset:    Not
 
-  Purpose of attribute:  The 'zrtp-hash' indicates that a UA supports
-                         the ZRTP protocol and provides a hash of the
-                         ZRTP Hello message.  The ZRTP protocol
+  Purpose of attribute:  The 'zrtp-hash' indicates that a 
+                         UA supports the ZRTP protocol and 
+                         provides a hash of the ZRTP Hello 
+                         message.  The ZRTP protocol 
                          version number is also specified.
 
   Allowed attribute values:  Hex
@@ -2588,7 +2735,7 @@ R-OTHER-SIGNALING is met since ZRTP can utilize modes in which there is no depen
 <t>
 R-RECORDING is met using the ZRTP Disclosure flag. </t>
 <t>
-R-TRANSCODER is met if the transcoder operates as a trusted MitM (i.e., a PBX). </t>
+R-TRANSCODER is met if the transcoder operates as a trusted MiTM (i.e., a PBX). </t>
 <t>
 R-ALLOW-RTP is met due to ZRTP's best effort encryption. </t>
 </list></t>
@@ -2673,6 +2820,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <?rfc include="reference.RFC.5479" ?>
 <?rfc include="reference.RFC.5759" ?>
 <?rfc include="reference.RFC.6188" ?>
+<?rfc include="reference.RFC.6637" ?>
 
 
 <reference anchor='FIPS-140-2-Annex-A'>
@@ -2840,13 +2988,14 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <?rfc include="reference.RFC.4579" ?>
 <?rfc include="reference.RFC.5117" ?>
 <?rfc include="reference.RFC.5245" ?>
+<?rfc include="reference.RFC.5246" ?>
 <?rfc include="reference.RFC.5764" ?>
 <?rfc include="reference.RFC.5869" ?>
 <?rfc include="reference.RFC.6090" ?>
+<?rfc include="reference.RFC.6562" ?>
 
 <!-- <?rfc include="reference.I-D.ietf-avt-srtp-aes-gcm" ?> -->
 <!-- <?rfc include="reference.I-D.jivsov-openpgp-ecc" ?> -->
-<!-- <?rfc include="reference.I-D.perkins-avt-srtp-vbr-audio" ?> -->
 <!-- <?rfc include="reference.I-D.wing-sip-identity-media" ?> -->
 
 <reference anchor='SRTP-AES-GCM' >
@@ -2858,6 +3007,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <seriesInfo name='Work in' value='Progress'/>
 </reference>
 
+<!--
 <reference anchor='ECC-OpenPGP' >
 <front>
 <title>ECC in OpenPGP</title>
@@ -2866,7 +3016,8 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 </front>
 <seriesInfo name='Work in' value='Progress'/>
 </reference>
-
+-->
+<!--
 <reference anchor='VBR-AUDIO' >
 <front>
 <title>Guidelines for the use of Variable Bit Rate Audio with Secure RTP</title>
@@ -2876,6 +3027,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 </front>
 <seriesInfo name='Work in' value='Progress'/>
 </reference>
+-->
 
 <reference anchor='SIP-IDENTITY' >
 <front>
