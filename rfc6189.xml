@@ -2813,7 +2813,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 </front>
 </reference>
 
-<reference anchor='pgpwordlist' target='http://en.wikipedia.org/w/index.php?title=PGP_word_list&oldid=400752943'>
+<reference anchor='pgpwordlist' target='http://en.wikipedia.org/w/index.php?title=PGP_word_list&amp;oldid=400752943'>
 <front>
 <title>PGP Word List</title>
 <author><organization/></author>
@@ -2984,7 +2984,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 </front>
 </reference>
 
-<reference anchor='Byzantine' target='http://en.wikipedia.org/w/index.php?title=Two_Generals%27_Problem&oldid=417855753'>
+<reference anchor='Byzantine' target='http://en.wikipedia.org/w/index.php?title=Two_Generals%27_Problem&amp;oldid=417855753'>
 <front>
 <title>The Two Generals' Problem</title>
 <author><organization/></author>
