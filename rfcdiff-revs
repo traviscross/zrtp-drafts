@@ -1,0 +1,18 @@
+#!/bin/bash
+
+rev1="$1"
+rev2="$2"
+outf="$3"
+
+if [ $# -lt 3 ]; then
+  echo "usage: $0 rev1 rev2 output"
+  exit 1
+fi
+
+git show $rev1:./rfc6189bis.xml > diff1.xml
+git show $rev2:./rfc6189bis.xml > diff2.xml
+xml2rfc diff1.xml diff1.txt
+xml2rfc diff2.xml diff2.txt
+./rfcdiff --stdout diff1.txt diff2.txt > $outf
+rm -f diff1.xml diff1.txt diff2.xml diff2.txt
+
