@@ -13,6 +13,7 @@
 <organization>Zfone Project</organization>
  <address>
  <postal>
+   <street></street>
    <city>Santa Cruz</city><region>California</region>
    </postal>
   <email>prz@mit.edu</email>
@@ -23,6 +24,7 @@
 <organization>Avaya</organization>
 <address>
 <postal>
+<street></street>
 <city>St. Louis</city><region>MO</region><code>63124</code>
    </postal>   <email>alan.b.johnston@gmail.com</email>   </address>
  </author>
