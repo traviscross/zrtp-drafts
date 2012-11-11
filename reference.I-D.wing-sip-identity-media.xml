@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='I-D.wing-sip-identity-media'>
+<front>
+<title>SIP Identity using Media Path</title>
+
+<author initials='D' surname='Wing' fullname='Dan Wing'>
+    <organization />
+</author>
+
+<author initials='H' surname='Kaplan' fullname='Hadriel Kaplan'>
+    <organization />
+</author>
+
+<date month='February' day='23' year='2008' />
+
+<abstract><t>This document defines a new SIP identity mechanism which operates through SBCs and B2BUAs.  This new identity mechanism creates a signature over certain SIP headers and certain SDP lines.  When the SIP body contains SDP, both the SIP signaling path and the media path are used to perform the identity function; when the SIP body contains non-SDP body parts, they are signed in their entirety.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-wing-sip-identity-media-02' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-wing-sip-identity-media-02.txt' />
+</reference>

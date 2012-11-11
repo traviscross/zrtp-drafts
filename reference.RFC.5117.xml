@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC5117'>
+
+<front>
+<title>RTP Topologies</title>
+<author initials='M.' surname='Westerlund' fullname='M. Westerlund'>
+<organization /></author>
+<author initials='S.' surname='Wenger' fullname='S. Wenger'>
+<organization /></author>
+<date year='2008' month='January' />
+<abstract>
+<t>This document discusses multi-endpoint topologies used in Real-time Transport Protocol (RTP)-based environments.  In particular, centralized topologies commonly employed in the video conferencing industry are mapped to the RTP terminology.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='5117' />
+<format type='TXT' octets='50293' target='http://www.rfc-editor.org/rfc/rfc5117.txt' />
+</reference>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='I-D.perkins-avt-srtp-vbr-audio'>
+<front>
+<title>Guidelines for the use of Variable Bit Rate Audio with Secure RTP</title>
+
+<author initials='C' surname='Perkins' fullname='Colin Perkins'>
+    <organization />
+</author>
+
+<author initials='J' surname='Valin' fullname='Jean-Marc Valin'>
+    <organization />
+</author>
+
+<date month='December' day='12' year='2010' />
+
+<abstract><t>This memo discusses potential security issues that arise when using variable bit rate audio with the secure RTP profile.  Guidelines to mitigate these issues are suggested.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-perkins-avt-srtp-vbr-audio-05' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-perkins-avt-srtp-vbr-audio-05.txt' />
+</reference>

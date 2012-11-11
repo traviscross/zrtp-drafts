@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC5759'>
+
+<front>
+<title>Suite B Certificate and Certificate Revocation List (CRL) Profile</title>
+<author initials='J.' surname='Solinas' fullname='J. Solinas'>
+<organization /></author>
+<author initials='L.' surname='Zieglar' fullname='L. Zieglar'>
+<organization /></author>
+<date year='2010' month='January' />
+<abstract>
+<t>This document specifies a base profile for X.509 v3 Certificates and X.509 v2 Certificate Revocation Lists (CRLs) for use with the United States National Security Agency's Suite B Cryptography.  The reader is assumed to have familiarity with RFC 5280, "Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile".  This document is not an Internet Standards Track specification; it is published for informational purposes.</t></abstract></front>
+
+<seriesInfo name='RFC' value='5759' />
+<format type='TXT' octets='21429' target='http://www.rfc-editor.org/rfc/rfc5759.txt' />
+</reference>

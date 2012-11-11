@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC2104'>
+
+<front>
+<title abbrev='HMAC'>HMAC: Keyed-Hashing for Message Authentication</title>
+<author initials='H.' surname='Krawczyk' fullname='Hugo Krawczyk'>
+<organization>IBM, T.J. Watson Research Center</organization>
+<address>
+<postal>
+<street>P.O.Box 704</street>
+<city>Yorktown Heights</city>
+<region>NY</region>
+<code>10598</code>
+<country>US</country></postal>
+<email>hugo@watson.ibm.com</email></address></author>
+<author initials='M.' surname='Bellare' fullname='Mihir Bellare'>
+<organization>University of California at San Diego, Dept of Computer Science and Engineering</organization>
+<address>
+<postal>
+<street>9500 Gilman Drive</street>
+<street>Mail Code 0114</street>
+<city>La Jolla</city>
+<region>CA</region>
+<code>92093</code>
+<country>US</country></postal>
+<email>mihir@cs.ucsd.edu</email></address></author>
+<author initials='R.' surname='Canetti' fullname='Ran Canetti'>
+<organization>IBM T.J. Watson Research Center</organization>
+<address>
+<postal>
+<street>P.O.Box 704</street>
+<city>Yorktown Heights</city>
+<region>NY</region>
+<code>10598</code>
+<country>US</country></postal>
+<email>canetti@watson.ibm.com</email></address></author>
+<date year='1997' month='February' />
+<abstract>
+<t>This document describes HMAC, a mechanism for message authentication using cryptographic hash functions. HMAC can be used with any iterative cryptographic hash function, e.g., MD5, SHA-1, in combination with a secret shared key.  The cryptographic strength of HMAC depends on the properties of the underlying hash function.</t></abstract></front>
+
+<seriesInfo name='RFC' value='2104' />
+<format type='TXT' octets='22297' target='http://www.rfc-editor.org/rfc/rfc2104.txt' />
+</reference>

@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC1191'>
+
+<front>
+<title>Path MTU discovery</title>
+<author initials='J.' surname='Mogul' fullname='Jeffrey Mogul'>
+<organization>Digital Equipment Corporation (DEC) , Western Research Laboratory</organization>
+<address>
+<postal>
+<street>100 Hamilton Avenue</street>
+<city>Palo Alto</city>
+<region>CA</region>
+<code>94301</code>
+<country>US</country></postal>
+<phone>+1 415 853 6643</phone>
+<email>mogul@decwrl.dec.com</email></address></author>
+<author initials='S.' surname='Deering' fullname='Steve Deering'>
+<organization>Xerox Palo Alto Research Center</organization>
+<address>
+<postal>
+<street>3333 Coyote Hill Road</street>
+<city>Palo Alto</city>
+<region>CA</region>
+<code>94304</code>
+<country>US</country></postal>
+<phone>+1 415 494 4839</phone>
+<email>deering@xerox.com</email></address></author>
+<date year='1990' day='1' month='November' />
+<abstract>
+<t>This memo describes a technique for dynamically discovering the maximum transmission unit (MTU) of an arbitrary internet path.  It specifies a small change to the way routers generate one type of ICMP
+ message.  For a path that passes through a router that has not been so changed, this technique might not discover the correct Path MTU, but it will always choose a Path MTU as accurate as, and in many cases more accurate than, the Path MTU that would be chosen by current practice.</t></abstract></front>
+
+<seriesInfo name='RFC' value='1191' />
+<format type='TXT' octets='47936' target='http://www.rfc-editor.org/rfc/rfc1191.txt' />
+</reference>

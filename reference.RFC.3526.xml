@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC3526'>
+
+<front>
+<title>More Modular Exponential (MODP) Diffie-Hellman groups for Internet Key Exchange (IKE)</title>
+<author initials='T.' surname='Kivinen' fullname='T. Kivinen'>
+<organization /></author>
+<author initials='M.' surname='Kojo' fullname='M. Kojo'>
+<organization /></author>
+<date year='2003' month='May' />
+<abstract>
+<t>This document defines new Modular Exponential (MODP) Groups for the Internet Key Exchange (IKE) protocol.  It documents the well known and used 1536 bit group 5, and also defines new 2048, 3072, 4096, 6144, and 8192 bit Diffie-Hellman groups numbered starting at 14.  The selection of the primes for theses groups follows the criteria established by Richard Schroeppel. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='3526' />
+<format type='TXT' octets='19166' target='http://www.rfc-editor.org/rfc/rfc3526.txt' />
+</reference>

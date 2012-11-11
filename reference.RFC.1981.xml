@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC1981'>
+
+<front>
+<title>Path MTU Discovery for IP version 6</title>
+<author initials='J.' surname='McCann' fullname='Jack McCann'>
+<organization>Digital Equipment Corporation</organization>
+<address>
+<postal>
+<street>110 Spitbrook Road</street>
+<street>ZKO3-3/U14</street>
+<city>Nashua</city>
+<region>NH</region>
+<code>03062</code>
+<country>US</country></postal>
+<phone>+1 603 881 2608</phone>
+<facsimile>+1 603 881 0120</facsimile>
+<email>mccann@zk3.dec.com</email></address></author>
+<author initials='S.' surname='Deering' fullname='Stephen E. Deering'>
+<organization>Xerox Palo Alto Research Center</organization>
+<address>
+<postal>
+<street>3333 Coyote Hill Road</street>
+<city>Palo Alto</city>
+<region>CA</region>
+<code>94304</code>
+<country>US</country></postal>
+<phone>+1 415 812 4839</phone>
+<facsimile>+1 415 812 4471</facsimile>
+<email>deering@parc.xerox.com</email></address></author>
+<author initials='J.' surname='Mogul' fullname='Jeffrey Mogul'>
+<organization>Digital Equipment Corporation, Western Research Laboratory</organization>
+<address>
+<postal>
+<street>250 University Avenue</street>
+<city>Palo Alto</city>
+<region>CA</region>
+<code>94301</code>
+<country>US</country></postal>
+<phone>+1 415 617 3304</phone>
+<email>mogul@pa.dec.com</email></address></author>
+<date year='1996' month='August' />
+<abstract>
+<t>This document describes Path MTU Discovery for IP version 6.  It is largely derived from RFC 1191, which describes Path MTU Discovery for IP version 4.</t></abstract></front>
+
+<seriesInfo name='RFC' value='1981' />
+<format type='TXT' octets='34088' target='http://www.rfc-editor.org/rfc/rfc1981.txt' />
+</reference>

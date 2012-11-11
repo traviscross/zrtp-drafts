@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC5479'>
+
+<front>
+<title>Requirements and Analysis of Media Security Management Protocols</title>
+<author initials='D.' surname='Wing' fullname='D. Wing'>
+<organization /></author>
+<author initials='S.' surname='Fries' fullname='S. Fries'>
+<organization /></author>
+<author initials='H.' surname='Tschofenig' fullname='H. Tschofenig'>
+<organization /></author>
+<author initials='F.' surname='Audet' fullname='F. Audet'>
+<organization /></author>
+<date year='2009' month='April' />
+<abstract>
+<t>This document describes requirements for a protocol to negotiate a security context for SIP-signaled Secure RTP (SRTP) media.  In addition to the natural security requirements, this negotiation protocol must interoperate well with SIP in certain ways.  A number of proposals have been published and a summary of these proposals is in the appendix of this document.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='5479' />
+<format type='TXT' octets='99096' target='http://www.rfc-editor.org/rfc/rfc5479.txt' />
+</reference>

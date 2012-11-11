@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC4475'>
+
+<front>
+<title>Session Initiation Protocol (SIP) Torture Test Messages</title>
+<author initials='R.' surname='Sparks' fullname='R. Sparks'>
+<organization /></author>
+<author initials='A.' surname='Hawrylyshen' fullname='A. Hawrylyshen'>
+<organization /></author>
+<author initials='A.' surname='Johnston' fullname='A. Johnston'>
+<organization /></author>
+<author initials='J.' surname='Rosenberg' fullname='J. Rosenberg'>
+<organization /></author>
+<author initials='H.' surname='Schulzrinne' fullname='H. Schulzrinne'>
+<organization /></author>
+<date year='2006' month='May' />
+<abstract>
+<t>This informational document gives examples of Session Initiation Protocol (SIP) test messages designed to exercise and "torture" a SIP implementation.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='4475' />
+<format type='TXT' octets='93276' target='http://www.rfc-editor.org/rfc/rfc4475.txt' />
+</reference>

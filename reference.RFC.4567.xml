@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC4567'>
+
+<front>
+<title>Key Management Extensions for Session Description Protocol (SDP) and Real Time Streaming Protocol (RTSP)</title>
+<author initials='J.' surname='Arkko' fullname='J. Arkko'>
+<organization /></author>
+<author initials='F.' surname='Lindholm' fullname='F. Lindholm'>
+<organization /></author>
+<author initials='M.' surname='Naslund' fullname='M. Naslund'>
+<organization /></author>
+<author initials='K.' surname='Norrman' fullname='K. Norrman'>
+<organization /></author>
+<author initials='E.' surname='Carrara' fullname='E. Carrara'>
+<organization /></author>
+<date year='2006' month='July' />
+<abstract>
+<t>This document defines general extensions for Session Description Protocol (SDP) and Real Time Streaming Protocol (RTSP) to carry messages, as specified by a key management protocol, in order to secure the media. These extensions are presented as a framework, to be used by one or more key management protocols. As such, their use is meaningful only when complemented by an appropriate key management protocol.&lt;/t>&lt;t> General guidelines are also given on how the framework should be used together with SIP and RTSP. The usage with the Multimedia Internet KEYing (MIKEY) key management protocol is also defined. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4567' />
+<format type='TXT' octets='67693' target='http://www.rfc-editor.org/rfc/rfc4567.txt' />
+</reference>

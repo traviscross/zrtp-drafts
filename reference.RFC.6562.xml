@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='RFC6562'>
+
+<front>
+<title>Guidelines for the Use of Variable Bit Rate Audio with Secure RTP</title>
+<author initials='C.' surname='Perkins' fullname='C. Perkins'>
+<organization /></author>
+<author initials='JM.' surname='Valin' fullname='JM. Valin'>
+<organization /></author>
+<date year='2012' month='March' />
+<abstract>
+<t>This memo discusses potential security issues that arise when using variable bit rate (VBR) audio with the secure RTP profile.  Guidelines to mitigate these issues are suggested. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='6562' />
+<format type='TXT' octets='14288' target='http://www.rfc-editor.org/rfc/rfc6562.txt' />
+</reference>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference anchor='I-D.jivsov-openpgp-ecc'>
+<front>
+<title>ECC in OpenPGP</title>
+
+<author initials='A' surname='Jivsov' fullname='Andrey Jivsov'>
+    <organization />
+</author>
+
+<date month='April' day='11' year='2012' />
+
+<abstract><t>This document defines an Elliptic Curve Cryptography extension to the OpenPGP public key format and specifies three Elliptic Curves that enjoy broad support by other standards, including standards published by the US National Institute of Standards and Technology.  The document specifies the conventions for interoperability between compliant OpenPGP implementations that make use of this extension.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-jivsov-openpgp-ecc-14' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-jivsov-openpgp-ecc-14.txt' />
+<format type='PDF'
+        target='http://www.ietf.org/internet-drafts/draft-jivsov-openpgp-ecc-14.pdf' />
+</reference>
