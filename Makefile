@@ -1,6 +1,6 @@
 # makefile
 
-all: rfc6189.txt rfc6189.html rfc6189.nr rfc6189.txt.pdf rfc6189.html.epub rfc6189.html.pdf rfc6189.xslt.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.txt.pdf rfc6189bis.html.epub rfc6189bis.html.pdf rfc6189bis.xslt.pdf rfc6189bis.diff.html
+all: rfc6189.txt rfc6189.html rfc6189.nr rfc6189.txt.pdf rfc6189.html.epub rfc6189.xslt.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.txt.pdf rfc6189bis.html.epub rfc6189bis.xslt.pdf rfc6189bis.diff.html
 
 clean:
 	rm -f *.html
