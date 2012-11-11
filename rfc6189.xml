@@ -3047,5 +3047,6 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 
 </references>
 <?rfc rfcedstyle="yes" ?>
+<?rfc symrefs="yes" ?>
 </back>
 </rfc>
