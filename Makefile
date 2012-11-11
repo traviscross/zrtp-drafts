@@ -1,6 +1,10 @@
 # makefile
 
-all: rfc6189.txt rfc6189.html rfc6189.nr rfc6189.txt.pdf rfc6189.html.epub rfc6189.xslt.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.txt.pdf rfc6189bis.html.epub rfc6189bis.xslt.pdf rfc6189bis.diff.html
+OUTPUTS=rfc6189.txt rfc6189.html rfc6189.nr rfc6189.txt.pdf rfc6189.html.epub rfc6189.xslt.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.txt.pdf rfc6189bis.html.epub rfc6189bis.xslt.pdf rfc6189bis.diff.html
+
+all: all-docs
+
+all-docs: $(OUTPUTS)
 
 clean:
 	rm -f *.txt *.html *.nr *.ps *.pdf *.epub *.exp.xml *.fo *.fop
@@ -10,6 +14,15 @@ fetch:
 
 rfc6189bis.diff.html: rfc6189.txt rfc6189bis.txt
 	./rfcdiff --stdout rfc6189.txt rfc6189bis.txt > $@
+
+rfc6189bis.tar: all-docs
+	mkdir -p rfc6189bis
+	cp $(OUTPUTS) rfc6189bis/
+	tar cvf rfc6189bis.tar rfc6189bis
+	rm -rf rfc6189bis
+
+%.tar.gz: %.tar
+	gzip -f -9 $<
 
 %.txt: %.xml
 	xml2rfc $< $@
