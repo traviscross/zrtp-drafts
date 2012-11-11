@@ -1,6 +1,6 @@
 # makefile
 
-all: rfc6189.txt rfc6189.html rfc6189.nr rfc6189.epub rfc6189.html.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.epub rfc6189bis.html.pdf rfc6189bis.diff.html
+all: rfc6189.txt rfc6189.html rfc6189.nr rfc6189.html.epub rfc6189.html.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.html.epub rfc6189bis.html.pdf rfc6189bis.diff.html
 
 clean:
 	rm -f *.html
@@ -17,7 +17,7 @@ rfc6189bis.diff.html: rfc6189.txt rfc6189bis.txt
 %.nr: %.xml
 	xml2rfc $< $@
 
-%.epub: %.html
+%.html.epub: %.html
 	ebook-convert $< $@
 
 %.html.pdf: %.html
