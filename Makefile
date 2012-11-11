@@ -27,5 +27,5 @@ rfc6189bis.diff.html: rfc6189.txt rfc6189bis.txt
 	ebook-convert $< $@
 
 %.html.pdf: %.html
-	wkhtmltopdf $< $@
+	wkhtmltopdf --zoom 1.25 $< $@
 

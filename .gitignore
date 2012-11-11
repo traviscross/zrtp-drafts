@@ -5,3 +5,6 @@
 /*.epub
 /*.pdf
 /*.ps
+/*.fo
+/*.fop
+/*.exp.xml
