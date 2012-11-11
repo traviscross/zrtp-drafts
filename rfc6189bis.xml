@@ -9,33 +9,37 @@
   submissionType="IETF" consensus="yes">
 <front>
 <title abbrev="ZRTP">ZRTP: Media Path Key Agreement for Unicast Secure RTP</title>
+
 <author initials="P." surname="Zimmermann" fullname="Philip Zimmermann">
 <organization>Zfone Project</organization>
- <address>
- <postal>
-   <street></street>
-   <city>Santa Cruz</city><region>California</region>
-   </postal>
-  <email>prz@mit.edu</email>
-  <uri>http://philzimmermann.com</uri>
-  </address> </author>
+<address>
+<postal>
+<street></street>
+<city>Santa Cruz</city><region>California</region>
+</postal>
+<email>prz@mit.edu</email>
+<uri>http://philzimmermann.com</uri>
+</address>
+</author>
 
- <author initials="A." surname="Johnston" fullname="Alan Johnston" role="editor">
+<author initials="A." surname="Johnston" fullname="Alan Johnston" role="editor">
 <organization>Avaya</organization>
 <address>
 <postal>
 <street></street>
 <city>St. Louis</city><region>MO</region><code>63124</code>
-   </postal>   <email>alan.b.johnston@gmail.com</email>   </address>
- </author>
+</postal>
+<email>alan.b.johnston@gmail.com</email>   </address>
+</author>
 
 <author initials="J." surname="Callas" fullname="Jon Callas">
 <organization>Apple, Inc.</organization>
- <address>
-  <email>jon@callas.org</email>
-  </address> </author>
+<address>
+<email>jon@callas.org</email>
+</address>
+</author>
 
-  <date month="July" year="2012"/>
+<date month="July" year="2012"/>
 
 <abstract>
 <t>
@@ -52,7 +56,7 @@ ZRTP is a key agreement protocol that performs a Diffie-Hellman key exchange dur
 <t>
 The ZRTP protocol has some nice cryptographic features lacking in many other approaches to media session encryption. Although it uses a public key algorithm, it does not rely on a public key infrastructure (PKI). In fact, it does not use persistent public keys at all. It uses ephemeral Diffie-Hellman (DH) with hash commitment and allows the detection of man-in-the-middle (MiTM) attacks by displaying a short authentication string (SAS) for the users to read and verbally compare over the phone. It has Perfect Forward Secrecy, meaning the keys are destroyed at the end of the call, which precludes retroactively compromising the call by future disclosures of key material. But even if the users are too lazy to bother with short authentication strings, we still get reasonable authentication against a MiTM attack, based on a form of key continuity. It does this by caching some key material to use in the next call, to be mixed in with the next call's DH shared secret, giving it key continuity properties analogous to Secure SHell (SSH). All this is done without reliance on a PKI, key certification, trust models, certificate authorities, or key management complexity that bedevils the email encryption world. It also does not rely on SIP signaling for the key management, and in fact, it does not rely on any servers at all. It performs its key agreements and key management in a purely peer-to-peer manner over the RTP packet stream. </t>
 <t>
-ZRTP can be used and discovered without being declared or indicated in the signaling path.  This provides a best effort SRTP capability.  Also, this reduces the complexity of implementations and minimizes interdependency between the signaling and media layers.  However, when ZRTP is indicated in the signaling via the zrtp-hash SDP attribute, ZRTP has additional useful properties.  By sending a hash of the ZRTP Hello message in the signaling, ZRTP provides a useful binding between the signaling and media paths, which is explained in <xref target='Binding2Signaling'/>. When this is done through a signaling path that has end-to-end integrity protection, the DH exchange is automatically protected from a MiTM attack, which is explained in <xref target='LeveragingIntegrityProtectedSIP'/>.  </t>
+ZRTP can be used and discovered without being declared or indicated in the signaling path.  This provides a best effort SRTP capability.  Also, this reduces the complexity of implementations and minimizes interdependency between the signaling and media layers.  However, when ZRTP is indicated in the signaling via the zrtp-hash SDP attribute, ZRTP has additional useful properties.  By sending a hash of the ZRTP Hello message in the signaling, ZRTP provides a useful binding between the signaling and media paths, which is explained in <xref target='Binding2Signaling'/>. When this is done through a signaling path that has end-to-end integrity protection, the DH exchange is automatically protected from a MiTM attack, which is explained in <xref target='LeveragingIntegrityProtectedSIP'/>. </t>
 <t>
 ZRTP is designed for unicast media sessions in which there is a voice media
 stream.  For multiparty secure conferencing, separate ZRTP sessions may be negotiated between each party and the conference bridge. For sessions lacking a voice media stream, MiTM protection may be provided by the mechanisms in Sections <xref target='LeveragingIntegrityProtectedSIP' format="counter"/> or <xref target='SignSAS' format="counter"/>.  In terms of the RTP topologies defined in <xref target="RFC5117"/>, ZRTP is designed for Point-to-Point topologies only. </t>
@@ -368,7 +372,7 @@ Both parties calculate a set of non-invertible hashes (implemented via the MAC d
   pbxsecretIDi = MAC(pbxsecret, "Initiator") 
 </artwork></figure>
 <t>
-The responder sends rs1IDr, rs2IDr, auxsecretIDr, and pbxsecretIDr in the DHPart1 message.  The initiator sends rs1IDi, rs2IDi, auxsecretIDi, and pbxsecretIDi in the DHPart2 message.  </t>
+The responder sends rs1IDr, rs2IDr, auxsecretIDr, and pbxsecretIDr in the DHPart1 message.  The initiator sends rs1IDi, rs2IDi, auxsecretIDi, and pbxsecretIDi in the DHPart2 message. </t>
 <t>
 The responder uses the locally computed rs1IDi, rs2IDi, auxsecretIDi, and pbxsecretIDi to compare against the corresponding fields in the received DHPart2 message.  The initiator uses the locally computed rs1IDr, rs2IDr, auxsecretIDr, and pbxsecretIDr to compare against the corresponding fields in the received DHPart1 message. </t>
 <t>
@@ -968,7 +972,7 @@ After the users have transitioned from SRTP media back to RTP media (clear mode)
 <section anchor='keydestruct1' title="Key Destruction for GoClear Message">
 
 <t>
-All SRTP session key material MUST be erased by the receiver of the GoClear message upon receiving a properly authenticated GoClear.  The same key destruction MUST be done by the sender of GoClear message, upon receiving the ClearACK.  This must be done for the key material for all of the media streams.  </t>
+All SRTP session key material MUST be erased by the receiver of the GoClear message upon receiving a properly authenticated GoClear.  The same key destruction MUST be done by the sender of GoClear message, upon receiving the ClearACK.  This must be done for the key material for all of the media streams. </t>
 <t>
 All key material that would have been erased at the end of the SIP session MUST be erased, as described in <xref target='keydestruct2'/>, with the single exception of ZRTPSess.  In this case, ZRTPSess is destroyed in a manner different from the other key material.  Both parties replace ZRTPSess with a KDF-derived non-invertible function of itself: </t>
 <figure><artwork>
@@ -2584,7 +2588,7 @@ The PBX SHOULD make best efforts to not act as a MiTM if the PBX has evidence th
 <t>
 If the client sends the a=zrtp-hash attribute, and the PBX acts as a MiTM nonetheless, the client SHOULD alert the user to the fact that the security level is less than expected.  The client can readily detect this condition by receiving an <xref target='SASrelay_Msg'>SASrelay message</xref> from the PBX.  The severity of the alert is left to the application, which would be relying on the trusted MiTM mechanism. </t>
 <t>
-A PBX should not act as a MiTM unless there is a compelling reason to do so.   Transcoding is fundamentally incompatible with end-to-end secure media.  It should be done only when there is no alternative, when the two ZRTP endpoints do not share a common codec.  ZRTP clients should implement a repertoire of codecs sufficient to minimize the need for PBX transcoding. <!-- Prevention of mismatched codecs can usually be achieved without unnecessary transcoding.  The PBX should not perform decoupled negotiations of codecs with each of the two clients, or add its own codecs to the mix, because that may lead to either mismatched codecs (which would cause a direct media connection to fail) or unnecessary transcoding. -->  Transcoding between two ZRTP clients forces a PBX to act as a MiTM.  If only one media stream needs transcoding in a multimedia session, all of the media streams in that session must be handled in MiTM mode.  </t>
+A PBX should not act as a MiTM unless there is a compelling reason to do so.   Transcoding is fundamentally incompatible with end-to-end secure media.  It should be done only when there is no alternative, when the two ZRTP endpoints do not share a common codec.  ZRTP clients should implement a repertoire of codecs sufficient to minimize the need for PBX transcoding. <!-- Prevention of mismatched codecs can usually be achieved without unnecessary transcoding.  The PBX should not perform decoupled negotiations of codecs with each of the two clients, or add its own codecs to the mix, because that may lead to either mismatched codecs (which would cause a direct media connection to fail) or unnecessary transcoding. -->  Transcoding between two ZRTP clients forces a PBX to act as a MiTM.  If only one media stream needs transcoding in a multimedia session, all of the media streams in that session must be handled in MiTM mode. </t>
 <t>
 If there is more than one media stream in a session between two ZRTP endpoints, a PBX MUST either act as a MiTM for all of them, or for none of them.  This is because all the media streams between two ZRTP endpoints must share the same <xref target='SAS'>SAS</xref>, due to the use of <xref target='Multistream1'>Multistream mode</xref>.  This includes the related RTCP/SRTCP streams. </t>
 <t>
