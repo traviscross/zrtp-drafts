@@ -1,0 +1,6 @@
+# gitignore
+/*.txt
+/*.html
+/*.nr
+/*.epub
+/*.pdf
