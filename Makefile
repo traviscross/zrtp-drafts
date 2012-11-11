@@ -5,6 +5,9 @@ all: rfc6189.txt rfc6189.html rfc6189.nr rfc6189.txt.ps rfc6189.txt.pdf rfc6189.
 clean:
 	rm -f *.html
 
+fetch:
+	wget -N http://zfone.com/docs/ietf/rfc6189bis.xml
+
 rfc6189bis.diff.html: rfc6189.txt rfc6189bis.txt
 	./rfcdiff --stdout rfc6189.txt rfc6189bis.txt > $@
 
