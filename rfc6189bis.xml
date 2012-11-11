@@ -1253,11 +1253,15 @@ Other block ciphers may be supported that have the same block size and key sizes
 <t>
 All ZRTP endpoints MUST support HMAC-SHA1 authentication tags for SRTP, with both 32-bit and 80-bit length tags as defined in <xref target="RFC3711"/>. </t>
 <t>
-ZRTP endpoints MAY support 32-bit and 64-bit SRTP authentication tags based on the <xref target="Skein">Skein hash function</xref>.  The Skein-512-MAC key length is fixed at 256 bits for this application, and the output length is adjustable.  The Skein MAC is defined in Sections 2.6 and 4.3 of <xref target="Skein"/> and is not based on the HMAC construct.  Reference implementations for Skein may be found at <xref target="Skein1"/>.  A Skein-based MAC is significantly more efficient than HMAC-SHA1, especially for short SRTP payloads. </t>
+ZRTP endpoints MAY support 32-bit and 64-bit SRTP authentication tags based on the <xref target="Keccak">SHA-3 hash function</xref> or the <xref target="Skein">Skein hash function</xref>. </t>
 <t>
-The Skein MAC key is computed by the SRTP key derivation function, which is also referred to as the AES-CM PRF, or pseudorandom function.  This is defined either in <xref target="RFC3711"/> or in <xref target='RFC6188'/>, depending on the selected SRTP AES key length.  To compute a Skein MAC key, the SRTP PRF output for the authentication key is left untruncated at 256 bits, instead of the usual truncated length of 160 bits (the key length used by HMAC-SHA1). </t>
+The SHA3-256-MAC function is defined as in <xref target="NegotiatedHash"/>. </t>
 <t>
-In <xref target="RFC3711"/>, Section 9.5 prohibits the use of 32-bit auth tags for SRTCP, regardless of the SRTP auth tag length.  Accordingly, if Skein is used for SRTP auth tags, SRTCP MUST use Skein 64-bit auth tags, regardless of the negotiated SRTP auth tag length. </t>
+The Skein-512-MAC key length is fixed at 256 bits for this application, and the output length is adjustable.  The Skein MAC is defined in Sections 2.6 and 4.3 of <xref target="Skein"/> and is not based on the HMAC construct.  Reference implementations for Skein may be found at <xref target="Skein1"/>.  A Skein-based MAC is significantly more efficient than HMAC-SHA1, especially for short SRTP payloads. </t>
+<t>
+The MAC key for SHA-3 or Skein is computed by the SRTP key derivation function, which is also referred to as the AES-CM PRF, or pseudorandom function.  This is defined either in <xref target="RFC3711"/> or in <xref target='RFC6188'/>, depending on the selected SRTP AES key length.  To compute this MAC key, the SRTP PRF output for the authentication key is left untruncated at 256 bits, instead of the usual truncated length of 160 bits (the key length used by HMAC-SHA1). </t>
+<t>
+In <xref target="RFC3711"/>, Section 9.5 prohibits the use of 32-bit auth tags for SRTCP, regardless of the SRTP auth tag length.  Accordingly, if SHA-3 or Skein is used for SRTP auth tags, SRTCP MUST use 64-bit auth tags, regardless of the negotiated SRTP auth tag length. </t>
 
 <figure><artwork>
   Auth Tag Type Block  |  Meaning
@@ -1267,6 +1271,14 @@ In <xref target="RFC3711"/>, Section 9.5 prohibits the use of 32-bit auth tags f
   ----------------------------------------------------------
   "HS80"               |  80-bit authentication tag based on
                        |  HMAC-SHA1 as defined in RFC 3711.
+  ----------------------------------------------------------
+  "NM32"               |  32-bit authentication tag based on
+                       |  SHA3-256-MAC as defined herein
+                       |  truncated to 32 bits of output.
+  ----------------------------------------------------------
+  "NM64"               |  64-bit authentication tag based on
+                       |  SHA3-256-MAC as defined herein
+                       |  truncated to 64 bits of output.
   ----------------------------------------------------------
   "SK32"               |  32-bit authentication tag based on
                        |  Skein-512-MAC as defined in [Skein],
