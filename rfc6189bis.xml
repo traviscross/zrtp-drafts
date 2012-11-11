@@ -1151,7 +1151,7 @@ Currently, 16 Message Type Blocks are defined -- they represent the set of ZRTP 
 <t>
 The hash algorithm and its related MAC algorithm are negotiated via the Hash Type Block found in the <xref target='HelloMsg'>Hello message</xref> and the <xref target='CommitMsg'>Commit message</xref>. </t>
 <t>
-All ZRTP endpoints MUST support a Hash Type of SHA-256 <xref target="FIPS-180-3"/>.  SHA-384 SHOULD be supported and MUST be supported if ECDH-384 is used.  Additional Hash Types MAY be used, such as the <xref target='SHA-3'>NIST SHA-3 hash</xref> when it becomes available.  Note that the Hash Type refers to the hash algorithm that will be used throughout the ZRTP key exchange, not the hash algorithm to be used in the SRTP Authentication Tag. </t>
+All ZRTP endpoints MUST support a Hash Type of SHA-256 <xref target="FIPS-180-3"/>.  SHA-384 SHOULD be supported and MUST be supported if ECDH-384 is used.  Additional Hash Types MAY be used, such as <xref target='Keccak'>SHA-3 (Keccak)</xref>.  Note that the Hash Type refers to the hash algorithm that will be used throughout the ZRTP key exchange, not the hash algorithm to be used in the SRTP Authentication Tag. </t>
 <t>
 The choice of the negotiated Hash Type is coupled to the Key Agreement Type, as explained in <xref target="KeyAgreementType"/>. </t>
 
@@ -1162,28 +1162,35 @@ The choice of the negotiated Hash Type is coupled to the Key Agreement Type, as 
   ----------------------------------------------------------
   "S384"          | SHA-384 Hash defined in FIPS 180-3
   ----------------------------------------------------------
-  "N256"          | NIST SHA-3 256-bit hash (when published)
+  "N256"          | SHA3-256 Hash to be defined in FIPS 180
   ----------------------------------------------------------
-  "N384"          | NIST SHA-3 384-bit hash (when published)
+  "N384"          | SHA3-384 Hash to be defined in FIPS 180
   ----------------------------------------------------------
   
   Table 2. Hash Type Block Values
 </artwork></figure>
 
 <t>
-At the time of this writing, the <xref target='SHA-3'>NIST SHA-3 hashes</xref> are not yet available.  NIST is expected to publish SHA-3 in 2012, as a successor to the SHA-2 hashes in <xref target="FIPS-180-3"/>. </t>
+At the time of this writing, the final FIPS PUB 180 report for <xref target='Keccak'>SHA-3</xref> is not yet available.  However it is expected that <xref target='Keccak'>SHA-3</xref> will be defined exactly as specified in the final <xref target='Keccak-sub'>Keccak SHA-3 submission</xref> to NIST and <xref target='Keccak-ref'>The Keccak Reference</xref>. </t>
 
 <section anchor='NegotiatedHash' title="Negotiated Hash and MAC Algorithm">
 <t>
-ZRTP makes use of message authentication codes (MACs) that are keyed hashes based on the negotiated Hash Type.  For the SHA-2 and SHA-3 hashes, the negotiated MAC is the HMAC based on the negotiated hash.  This MAC function is also used in the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref>. </t>
+ZRTP makes use of message authentication codes (MACs) that are keyed hashes based on the negotiated Hash Type.  For the SHA-2 hash, the negotiated MAC is the HMAC based on the negotiated hash.  For the SHA-3 hash, the <xref target="Sponge">built-in MAC features of the SHA-3 sponge construct</xref> are employed.  This MAC function is also used in the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref>. </t>
+<t>
+We define the MAC function for SHA-3 family only for key sizes which are equal to the output length of the hash function.  A key must be truncated to this length if it would be too long, or must be padded with zeros at its end if it would be too short.  The SHA3 function is the negotiated Hash Type of either SHA3-256 or SHA3-384. </t>
+
+<figure><artwork>
+  SHA3-MAC(key, msg) = SHA3(key || msg)
+</artwork></figure>
+
+<t>
+The security of the SHA3-MAC construct is discussed in <xref target="Sponge"/>.  In particular, we note that the success probability of an attack against this MAC is asserted to be (2^c)/(m-1), where c is the SHA-3 capacity parameter which is equal to twice the output length of the SHA3-256 and SHA3-384 functions, and m is the maximum number of messages that are MACed with the same key.  The SHA-3 authors assert that security is assured if the key length is less than c - log2(m).  The definition of SHA3-MAC above fulfills this requirement for all realistic values of m. </t>
 <t>
 The HMAC function is defined in <xref target="FIPS-198-1"/>.  A discussion of the general security of the HMAC construction may be found in <xref target="RFC2104"/>.  Test vectors for HMAC-SHA-256 and HMAC-SHA-384 may be found in <xref target="RFC4231"/>. </t>
 <t>
 The negotiated Hash Type does not apply to the hash used in the digital signature defined in <xref target='SignSAS'/>.  For example, even if the negotiated Hash Type is SHA-256, the digital signature may use SHA-384 if an Elliptic Curve Digital Signature Algorithm (ECDSA) P-384 signature key is used.  Digital signatures are optional in ZRTP. </t>
 <t>
 Except for the aforementioned digital signatures, and the special cases noted in <xref target="ImplicitHash"/>, all the other hashes and MACs used throughout the ZRTP protocol will use the negotiated Hash Type. </t>
-<t>
-A future hash may include its own built-in MAC, not based on the HMAC construct, for example, the <xref target="Skein">Skein hash function</xref>.  If NIST chooses such a hash as the SHA-3 winner, Hash Types "N256", and "N384" will still use the related HMAC as the negotiated MAC.  If an implementer wishes to use Skein and its built-in MAC as the negotiated MAC, new Hash Types must be used. </t>
 
 </section>
 
@@ -1201,7 +1208,7 @@ The MACs that are keyed by this hash chain, as defined in <xref target='Leveragi
 The Hello Hash in the a=zrtp-hash attribute defined in <xref target='Binding2Signaling'/>. </t>
 </list></t>
 <t>
-ZRTP defines a method for <xref target='version_negotiation'>negotiating different ZRTP protocol versions</xref>.  SHA-256 is the Implicit Hash and HMAC-SHA-256 is the Implicit MAC for ZRTP protocol version 1.10.  Future ZRTP protocol versions may, if appropriate, use another hash algorithm as the Implicit Hash, such as the <xref target='SHA-3'>NIST SHA-3 hash</xref>, when it becomes available.  For example, a future SIP packet may list two a=zrtp-hash SDP attributes, one based on SHA-256 for ZRTP version 1.10, and another based on SHA-3 for ZRTP version 2.00. </t>
+ZRTP defines a method for <xref target='version_negotiation'>negotiating different ZRTP protocol versions</xref>.  SHA-256 is the Implicit Hash and HMAC-SHA-256 is the Implicit MAC for ZRTP protocol version 1.10.  Future ZRTP protocol versions may, if appropriate, use another hash algorithm as the Implicit Hash, such as the <xref target='Keccak'> SHA-3 hash</xref>.  For example, a future SIP packet may list two a=zrtp-hash SDP attributes, one based on SHA-256 for ZRTP version 1.10, and another based on SHA-3 for ZRTP version 2.00. </t>
 
 </section>
 
@@ -3067,13 +3074,47 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-131A/sp800-131A.pdf'/>
 </reference>
 
-<reference anchor='SHA-3'>
+<reference anchor='Keccak' target='http://keccak.noekeon.org/'>
 <front>
-<title>Cryptographic Hash Algorithm Competition</title>
-<author fullname='NIST Computer Security Resource Center'><organization/></author>
+<title>The Keccak Sponge Function Family</title>
+<author fullname='Guido Bertoni'><organization/></author>
+<author fullname='Joan Daemen'><organization/></author>
+<author fullname='Michaël Peeters'><organization/></author>
+<author fullname='Gilles Van Assche'><organization/></author>
 </front>
-<seriesInfo name='NIST Computer Security Resource Center' value='Cryptographic Hash Project'/>
-<format type='HTML' target='http://csrc.nist.gov/groups/ST/hash/sha-3/index.html'/>
+</reference>
+
+<reference anchor='Keccak-ref' target='http://keccak.noekeon.org/Keccak-reference-3.0.pdf'>
+<front>
+<title>The Keccak Reference (Version 3.0)</title>
+<author fullname='Guido Bertoni'><organization/></author>
+<author fullname='Joan Daemen'><organization/></author>
+<author fullname='Michaël Peeters'><organization/></author>
+<author fullname='Gilles Van Assche'><organization/></author>
+<date day="14" month="January" year="2011"/>
+</front>
+</reference>
+
+<reference anchor='Keccak-sub' target='http://keccak.noekeon.org/Keccak-submission-3.pdf'>
+<front>
+<title>The Keccak SHA-3 Submission (Version 3.0)</title>
+<author fullname='Guido Bertoni'><organization/></author>
+<author fullname='Joan Daemen'><organization/></author>
+<author fullname='Michaël Peeters'><organization/></author>
+<author fullname='Gilles Van Assche'><organization/></author>
+<date day="14" month="January" year="2011"/>
+</front>
+</reference>
+
+<reference anchor='Sponge' target='http://sponge.noekeon.org/CSF-0.1.pdf'>
+<front>
+<title>Cryptographic Sponge Functions (Version 0.1)</title>
+<author fullname='Guido Bertoni'><organization/></author>
+<author fullname='Joan Daemen'><organization/></author>
+<author fullname='Michaël Peeters'><organization/></author>
+<author fullname='Gilles Van Assche'><organization/></author>
+<date day="14" month="January" year="2011"/>
+</front>
 </reference>
 
 <reference anchor='Skein1' target='http://www.skein-hash.info/'>
