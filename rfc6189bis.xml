@@ -1175,7 +1175,7 @@ At the time of this writing, the final FIPS PUB 180 report for <xref target='Kec
 
 <section anchor='NegotiatedHash' title="Negotiated Hash and MAC Algorithm">
 <t>
-ZRTP makes use of message authentication codes (MACs) that are keyed hashes based on the negotiated Hash Type.  For the SHA-2 hash, the negotiated MAC is the HMAC based on the negotiated hash.  For the SHA-3 hash, the <xref target="Sponge">built-in MAC features of the SHA-3 sponge construct</xref> are employed.  This MAC function is also used in the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref>. </t>
+ZRTP makes use of message authentication codes (MACs) that are keyed hashes based on the negotiated Hash Type.  For the SHA-2 hash, the negotiated MAC is the HMAC based on the negotiated hash.  For the SHA-3 hash, the <xref target="Sponge">built-in MAC features of the SHA-3 sponge construct</xref> are used.  This MAC function is also used in the <xref target='ZRTP_KDF'>ZRTP key derivation function</xref>. </t>
 <t>
 We define the MAC function for SHA-3 family only for key sizes which are equal to the output length of the hash function.  A key must be truncated to this length if it would be too long, or must be padded with zeros at its end if it would be too short.  The SHA3 function is the negotiated Hash Type of either SHA3-256 or SHA3-384. </t>
 
