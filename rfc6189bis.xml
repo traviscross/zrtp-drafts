@@ -1184,8 +1184,6 @@ We define the MAC function for SHA-3 family only for key sizes which are equal t
 </artwork></figure>
 
 <t>
-The security of the SHA3-MAC construct is discussed in <xref target="Sponge"/>.  In particular, we note that the success probability of an attack against this MAC is asserted to be (2^c)/(m-1), where c is the SHA-3 capacity parameter which is equal to twice the output length of the SHA3-256 and SHA3-384 functions, and m is the maximum number of messages that are MACed with the same key.  The SHA-3 authors assert that security is assured if the key length is less than c - log2(m).  The definition of SHA3-MAC above fulfills this requirement for all realistic values of m. </t>
-<t>
 The HMAC function is defined in <xref target="FIPS-198-1"/>.  A discussion of the general security of the HMAC construction may be found in <xref target="RFC2104"/>.  Test vectors for HMAC-SHA-256 and HMAC-SHA-384 may be found in <xref target="RFC4231"/>. </t>
 <t>
 The negotiated Hash Type does not apply to the hash used in the digital signature defined in <xref target='SignSAS'/>.  For example, even if the negotiated Hash Type is SHA-256, the digital signature may use SHA-384 if an Elliptic Curve Digital Signature Algorithm (ECDSA) P-384 signature key is used.  Digital signatures are optional in ZRTP. </t>
