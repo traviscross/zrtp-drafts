@@ -17,14 +17,12 @@ fetch:
 rfc6189bis.diff.html: rfc6189.txt rfc6189bis.txt
 	./rfcdiff --stdout rfc6189.txt rfc6189bis.txt > $@
 
-rfc6189bis.tar: all-docs
+rfc6189bis.tar.gz: $(OUTPUTS)
 	mkdir -p rfc6189bis
 	cp $(OUTPUTS) rfc6189bis/
 	tar cvf rfc6189bis.tar rfc6189bis
 	rm -rf rfc6189bis
-
-%.tar.gz: %.tar
-	gzip -f -9 $<
+	gzip -f -9 rfc6189bis.tar
 
 %.txt: %.xml
 	xml2rfc $< $@
