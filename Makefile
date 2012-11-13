@@ -6,6 +6,8 @@ all: all-docs
 
 all-docs: $(OUTPUTS)
 
+bundle: rfc6189bis.tar.gz
+
 clean:
 	rm -f *.txt *.html *.nr *.ps *.pdf *.epub *.exp.xml *.fo *.fop
 
