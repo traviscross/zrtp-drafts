@@ -1171,7 +1171,7 @@ The choice of the negotiated Hash Type is coupled to the Key Agreement Type, as 
 </artwork></figure>
 
 <t>
-At the time of this writing, the final FIPS PUB 180 report for <xref target='Keccak'>SHA-3</xref> is not yet available.  However it is expected that <xref target='Keccak'>SHA-3</xref> will be defined exactly as specified in the final <xref target='Keccak-sub'>Keccak SHA-3 submission</xref> to NIST and <xref target='Keccak-ref'>The Keccak Reference</xref>. </t>
+At the time of this writing, the final FIPS PUB 180 report for <xref target='Keccak'>SHA-3</xref> is not yet available.  However it is expected that <xref target='Keccak'>SHA-3</xref> will be defined as specified in the final <xref target='Keccak-sub'>Keccak SHA-3 submission</xref> to NIST and <xref target='Keccak-ref'>The Keccak Reference</xref>. </t>
 
 <section anchor='NegotiatedHash' title="Negotiated Hash and MAC Algorithm">
 <t>
