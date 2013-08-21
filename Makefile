@@ -1,29 +1,33 @@
 #### -*- mode:makefile -*-
 ## Build-Depends: xml2rfc, enscript, ghostscript, calibre, wkhtmltopdf, libsaxon-java, fop
 
-OUTPUTS=rfc6189.txt rfc6189.html rfc6189.nr rfc6189.txt.pdf rfc6189.html.epub rfc6189.xslt.pdf rfc6189bis.txt rfc6189bis.html rfc6189bis.nr rfc6189bis.txt.pdf rfc6189bis.html.epub rfc6189bis.xslt.pdf rfc6189bis.diff.html
+NAME=rfc6189bis
+NAME0=rfc6189
+OUTPUTS=$(NAME0).txt $(NAME0).html $(NAME0).nr $(NAME0).txt.pdf $(NAME0).html.epub $(NAME0).xslt.pdf
+OUTPUTS+=$(NAME).txt $(NAME).html $(NAME).nr $(NAME).txt.pdf $(NAME).html.epub $(NAME).xslt.pdf
+OUTPUTS+=$(NAME).diff.html
 
 all: all-docs bundle
 
 all-docs: $(OUTPUTS)
 
-bundle: rfc6189bis.tar.gz
+bundle: $(NAME).tar.gz
 
 clean:
 	rm -f *.txt *.html *.nr *.ps *.pdf *.epub *.exp.xml *.fo *.fop
 
 fetch:
-	wget -N http://zfone.com/docs/ietf/rfc6189bis.xml
+	wget -N http://zfone.com/docs/ietf/$(NAME).xml
 
-rfc6189bis.diff.html: rfc6189.txt rfc6189bis.txt
-	./rfcdiff --stdout rfc6189.txt rfc6189bis.txt > $@
+$(NAME).diff.html: $(NAME0).txt $(NAME).txt
+	./rfcdiff --stdout $(NAME0).txt $(NAME).txt > $@
 
-rfc6189bis.tar.gz: $(OUTPUTS)
-	mkdir -p rfc6189bis
-	cp $(OUTPUTS) rfc6189bis/
-	tar cvf rfc6189bis.tar rfc6189bis
-	rm -rf rfc6189bis
-	gzip -f -9 rfc6189bis.tar
+$(NAME).tar.gz: $(OUTPUTS)
+	mkdir -p $(NAME)
+	cp $(OUTPUTS) $(NAME)/
+	tar cvf $(NAME).tar $(NAME)
+	rm -rf $(NAME)
+	gzip -f -9 $(NAME).tar
 
 %.txt: %.xml
 	xml2rfc $< $@
