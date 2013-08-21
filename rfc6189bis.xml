@@ -509,8 +509,14 @@ The initiator calculates the same Diffie-Hellman result using: </t>
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange in the following order is calculated by both parties: </t>
 <figure><artwork>
+  ;; for ZRTP version 1.10
   total_hash = hash(Hello of responder || Commit || 
                     DHPart1 || DHPart2)
+
+  ;; for ZRTP version 1.11
+  total_hash = hash(Hello of initiator ||
+                    Hello of responder ||
+                    Commit || DHPart1 || DHPart2)
 </artwork></figure>
 <t>
 Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format="counter"/>, <xref target='DHCommit_Msg' format="counter"/>, <xref target='DHPart1_Msg' format="counter"/>, and <xref target='DHPart2_Msg' format="counter"/>), not the entire ZRTP packets, are included in the total_hash. </t>
@@ -633,7 +639,13 @@ and the H3 field in the responder's <xref target='Hello_Msg'>Hello message</xref
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange for the current media stream is calculated: </t>
 <figure><artwork>
+  ;; for ZRTP version 1.10
   total_hash = hash(Hello of responder || Commit)
+
+  ;; for ZRTP version 1.11
+  total_hash = hash(Hello of initiator ||
+                    Hello of responder ||
+                    Commit)
 </artwork></figure>
 <t>
 Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format='counter'/> and <xref target='PrshCommit_Msg' format='counter'/>), not the entire ZRTP packets, are included in the total_hash. </t>
@@ -699,7 +711,13 @@ and the H3 field in the responder's <xref target='Hello_Msg'>Hello message</xref
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange for the current media stream is calculated: </t>
 <figure><artwork>
+  ;; for ZRTP version 1.10
   total_hash = hash(Hello of responder || Commit) 
+
+  ;; for ZRTP version 1.11
+  total_hash = hash(Hello of initiator ||
+                    Hello of responder ||
+                    Commit) 
 </artwork></figure>
 <t>
 This refers to the Hello and Commit messages for the current media stream, which is using Multistream mode, not the original media stream that included a full DH key agreement.  Note that only the ZRTP messages (Figures <xref target='Hello_Msg' format='counter'/> and <xref target='MultCommit_Msg' format='counter'/>), not the entire ZRTP packets, are included in the hash. </t>
