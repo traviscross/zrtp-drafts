@@ -233,7 +233,7 @@ If a Hello message, or any other ZRTP message, indicates that there is a synchro
 <section anchor='version_negotiation' title="Protocol Version Negotiation">
 
 <t>
-This specification defines ZRTP version 1.10.  Since new versions of ZRTP may be developed in the future, this specification defines a protocol version negotiation in this section. </t>
+This specification defines ZRTP version 1.11.  Since new versions of ZRTP may be developed in the future, this specification defines a protocol version negotiation in this section. </t>
 <t>
 Each party declares what version of the ZRTP protocol they support via the version field in the Hello message (<xref target='HelloMsg'/>).  If both parties have the same version number in their Hello messages, they can proceed with the rest of the protocol.  To facilitate both parties reaching this state of protocol version agreement in their Hello messages, ZRTP should use information provided in the signaling layer, if available.  If a ZRTP endpoint supports more than one version of the protocol, it SHOULD declare them all in a list of SIP SDP a=zrtp-hash attributes (defined in <xref target='SignalingInteractions'/>), listing separate hashes, with separate ZRTP version numbers in each item in the list. </t>
 <t>
@@ -1206,7 +1206,7 @@ The MACs that are keyed by this hash chain, as defined in <xref target='Leveragi
 The Hello Hash in the a=zrtp-hash attribute defined in <xref target='Binding2Signaling'/>. </t>
 </list></t>
 <t>
-ZRTP defines a method for <xref target='version_negotiation'>negotiating different ZRTP protocol versions</xref>.  SHA-256 is the Implicit Hash and HMAC-SHA-256 is the Implicit MAC for ZRTP protocol version 1.10.  Future ZRTP protocol versions may, if appropriate, use another hash algorithm as the Implicit Hash, such as the <xref target='Keccak'> SHA-3 hash</xref>.  For example, a future SIP packet may list two a=zrtp-hash SDP attributes, one based on SHA-256 for ZRTP version 1.10, and another based on SHA-3 for ZRTP version 2.00. </t>
+ZRTP defines a method for <xref target='version_negotiation'>negotiating different ZRTP protocol versions</xref>.  SHA-256 is the Implicit Hash and HMAC-SHA-256 is the Implicit MAC for ZRTP protocol version 1.11.  Future ZRTP protocol versions may, if appropriate, use another hash algorithm as the Implicit Hash, such as the <xref target='Keccak'> SHA-3 hash</xref>.  For example, a future SIP packet may list two a=zrtp-hash SDP attributes, one based on SHA-256 for ZRTP version 1.10, and another based on SHA-3 for ZRTP version 2.00. </t>
 
 </section>
 
@@ -1411,7 +1411,7 @@ The Hello message has the format shown in <xref target='Hello_Msg'/>. </t>
 <t>
 All ZRTP messages begin with the preamble value 0x505a, then a 16-bit length in 32-bit words.  This length includes only the ZRTP message (including the preamble and the length) but not the ZRTP packet header or CRC.  The 8-octet Message Type follows the length field. </t>
 <t>
-Next, there is a 4-character string containing the version (ver) of the ZRTP protocol, which is "1.10" for this specification. 
+Next, there is a 4-character string containing the version (ver) of the ZRTP protocol, which is "1.11" for this specification. 
 Next, there is the Client Identifier string (cid), which is 4 words long and identifies the vendor and release of the ZRTP software. 
 The 256-bit hash image H3 is defined in <xref target='Hashchains'/>.  The next parameter is the ZID, the 96-bit-long unique identifier for the ZRTP endpoint, defined in <xref target='CacheOperation'/>. </t>
 <t>
@@ -1440,7 +1440,7 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 |            Message Type Block="Hello   " (2 words)            |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   version="1.10" (1 word)                     |
+|                   version="1.11" (1 word)                     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |                Client Identifier (4 words)                    |
@@ -2023,7 +2023,7 @@ The Ping message contains a version number that defines what version of PingACK 
 |             Message Type Block="Ping    " (2 words)           |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   version="1.10" (1 word)                     |
+|                   version="1.11" (1 word)                     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                    EndpointHash (2 words)                     |
 |                                                               |
@@ -2046,7 +2046,7 @@ This is not always easy to do, as it may have to be done without help from the s
 <section anchor='PingACKMsg' title="PingACK Message">
 
 <t>
-A PingACK message is sent only in response to a Ping.  A ZRTP endpoint MUST respond to a Ping with a PingACK message. The version of PingACK requested is contained in the Ping message.  If that version number is supported, a PingACK with a format that matches that version MUST be sent.  Otherwise, if the version number of the Ping is not supported, a PingACK SHOULD be sent in the format of the highest supported version known to the Ping responder.  Only version "1.10" is supported in this specification. </t>
+A PingACK message is sent only in response to a Ping.  A ZRTP endpoint MUST respond to a Ping with a PingACK message. The version of PingACK requested is contained in the Ping message.  If that version number is supported, a PingACK with a format that matches that version MUST be sent.  Otherwise, if the version number of the Ping is not supported, a PingACK SHOULD be sent in the format of the highest supported version known to the Ping responder.  Only version "1.10" or "1.11" is supported in this specification. </t>
 <t>
 The PingACK message carries its own 64-bit EndpointHash, distinct from the EndpointHash of the other party's Ping message.  It is REQUIRED that it be highly improbable for two participants in a call to have the same EndpointHash and that an EndpointHash maintains a persistent value between calls.  For a normal ZRTP endpoint, such as a ZRTP-enabled VoIP client, the EndpointHash can be just the truncated ZID.  For a ZRTP endpoint such as a PBX that has multiple endpoints behind it, the EndpointHash must be a distinct value for each endpoint behind it.  It is recommended that the EndpointHash be a truncated hash of the ZID of the ZRTP endpoint concatenated with something unique about the actual endpoint or phone behind the PBX.  This may be the SIP URI of the phone, the PBX extension number, or the local IP address of the phone, whichever is more readily available in the application environment: </t>
 <figure><artwork>
@@ -2071,7 +2071,7 @@ The PingACK message contains the EndpointHash of the sender of the PingACK as we
 |             Message Type Block="PingACK " (2 words)           |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   version="1.10" (1 word)                     |
+|                   version="1.11" (1 word)                     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |           EndpointHash of PingACK Sender (2 words)            |
 |                                                               |
@@ -2417,7 +2417,7 @@ Here's an example of the ZRTP attribute in an initial SDP offer or answer used a
   a=rtpmap:97 iLBC/8000
   a=rtpmap:33 no-op/8000
 &lt;allOneLine&gt;
-  a=zrtp-hash:1.10 fe30efd02423cb054e50efd0248742ac7a52c8f91bc2
+  a=zrtp-hash:1.11 fe30efd02423cb054e50efd0248742ac7a52c8f91bc2
   df881ae642c371ba46df
 &lt;/allOneLine&gt;
 </artwork></figure>
