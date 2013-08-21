@@ -1757,7 +1757,7 @@ If the signature length (in words) is non-zero, a signature type block will be p
 <t>
 The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator uses the zrtpkeyi to encrypt the Confirm2 message. </t>
 
-<figure anchor='Confirm_Msg' title="Confirm1 and Confirm2 Message Format"><artwork>
+<figure anchor='Confirm_Msg_v1.10' title="Confirm1 and Confirm2 Message Format v1.10"><artwork>
  0                   1                   2                   3 
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
@@ -1791,6 +1791,42 @@ The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator 
 |                                                               |
 |                                                               |
 +===============================================================+
+</artwork></figure>
+
+<figure anchor='Confirm_Msg' title="Confirm1 and Confirm2 Message Format v1.11"><artwork>
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      Message Type Block="Confirm1" or "Confirm2" (2 words)    |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                CFB Initialization Vector (4 words)            |
+|                                                               |
+|                                                               |
++===============================================================+
+|                                                               |
+|                  Hash preimage H0 (8 words)                   |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|E|V|A|D| 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|              cache expiration interval (1 word)               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      optional signature type block (1 word if present)        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|           optional signature block (variable length)          |
+|                            . . .                              |
+|                                                               |
+|                                                               |
++===============================================================+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </artwork></figure>
 
 </section>
@@ -1963,7 +1999,7 @@ If the signature length (in words) is non-zero, a signature type block will be p
 <t>
 Depending on whether the trusted MiTM had taken the role of the initiator or the responder during the ZRTP key negotiation, the SASrelay message is encrypted with zrtpkeyi or zrtpkeyr. </t>
 
-<figure anchor='SASrelay_Msg' title="SASrelay Message Format"><artwork>
+<figure anchor='SASrelay_Msg_v1.10' title="SASrelay Message Format v1.10"><artwork>
  0                   1                   2                   3 
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
@@ -1997,6 +2033,43 @@ Depending on whether the trusted MiTM had taken the role of the initiator or the
 |                                                               |
 |                                                               |
 +===============================================================+
+</artwork></figure>
+
+<figure anchor='SASrelay_Msg' title="SASrelay Message Format v1.11"><artwork>
+ 0                   1                   2                   3 
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Message Type Block="SASrelay" (2 words)           |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|                CFB Initialization Vector (4 words)            |
+|                                                               |
+|                                                               |
++===============================================================+
+| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|0|V|A|D| 
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           rendering scheme of relayed SAS (1 word)            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|            Trusted MiTM relayed sashash (8 words)             |
+|                             . . .                             |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      optional signature type block (1 word if present)        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|           optional signature block (variable length)          |
+|                            . . .                              |
+|                                                               |
+|                                                               |
++===============================================================+
+|                         MAC (2 words)                         |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 </artwork></figure>
 
 </section>
