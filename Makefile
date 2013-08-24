@@ -24,7 +24,7 @@ $(NAME).diff.html: $(NAME0).txt $(NAME).txt
 
 $(NAME).tar.gz: $(OUTPUTS)
 	mkdir -p $(NAME)
-	cp $(OUTPUTS) $(NAME)/
+	cp $(NAME).xml $(NAME0).xml $(OUTPUTS) $(NAME)/
 	tar cvf $(NAME).tar $(NAME)
 	rm -rf $(NAME)
 	gzip -f -9 $(NAME).tar
