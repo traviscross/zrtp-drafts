@@ -2190,14 +2190,14 @@ ZRTP endpoints MUST NOT exceed the bandwidth of the resulting media session as d
 <t>
 The <xref target='PingMsg'>Ping message</xref> may follow the same retransmission schedule as the Hello message, but this is not required in this specification.  Ping message retransmission is subject to application-specific ZRTP proxy heuristics. </t>
 <t>
-Hello ZRTP messages are retransmitted at an interval that starts at T1 seconds and doubles after every retransmission, capping at 200 ms.  T1 has a recommended initial value of 50 ms.  A Hello message is retransmitted 20 times before giving up, which means the entire retry schedule for Hello messages is exhausted after 3.75 seconds (50 + 100 + 18*200 ms).  Retransmission of a Hello ends upon receipt of a HelloACK or Commit message. </t>
+Hello ZRTP messages are retransmitted at an interval that starts at T1 seconds and doubles after every retransmission, capping at 1600 ms.  T1 has a recommended initial value of 50 ms.  A Hello message is retransmitted at least 50 times before giving up, which means the retry schedule for Hello messages may be exhausted after 73.55 seconds (50 + 100 + 200 + 400 + 800 + 45*1600 ms).  Retransmission of a Hello ends upon receipt of a HelloACK or Commit message. </t>
 
 <t>
 The post-Hello ZRTP messages are retransmitted only by the session initiator -- that is, only Commit, DHPart2, and Confirm2 are retransmitted if the corresponding message from the responder, DHPart1, Confirm1, and Conf2ACK, are not received.  Note that the Confirm2 message retransmission can also be stopped by receiving the first SRTP media (with a valid SRTP auth tag) from the responder. </t>
 <t>
 The GoClear, Error, and SASrelay messages may be initiated and retransmitted by either party, and responded to by the other party, regardless of which party is the overall session initiator.  They are retransmitted if the corresponding response message ClearACK, ErrorACK, and RelayACK are not received. </t>
 <t>
-Non-Hello (and non-Ping) ZRTP messages are retransmitted at an interval that starts at T2 seconds and doubles after every retransmission, capping at 1200 ms.  T2 has a recommended initial value of 150 ms.  Each non-Hello message is retransmitted 10 times before giving up, which means the entire retry schedule is exhausted after 9.45 seconds (150 + 300 + 600 + 7*1200 ms).  Only the initiator performs retransmissions.  Each message has a response message that stops retransmissions, as shown in the table below.  The higher values of T2 means that retransmissions will likely occur only in the event of packet loss. </t>
+Non-Hello (and non-Ping) ZRTP messages are retransmitted at an interval that starts at T2 seconds and doubles after every retransmission, capping at 1200 ms.  T2 has a recommended initial value of 150 ms.  Each non-Hello message is retransmitted indefinitely, until it receives the appropriate response message.  Only the initiator performs retransmissions.  Each message has a response message that stops retransmissions, as shown in the table below.  The higher values of T2 means that retransmissions will likely occur only in the event of packet loss. </t>
 
 <figure><artwork>
   Message      Acknowledgement Message
@@ -2220,7 +2220,7 @@ The retry schedule must handle not only packet loss, but also slow or heavily lo
 <t>
 Slow or heavily loaded ZRTP endpoints that are at risk of taking too long to perform their DH calculation SHOULD use a HelloACK message instead of a Commit message to reply to a Hello from the other party. </t>
 <t>
-If a ZRTP endpoint has evidence that the other party is a ZRTP endpoint, by receiving a Hello message or Ping message, or by receiving a Hello Hash in the signaling layer, it SHOULD extend its own Hello retry schedule to span at least 12 seconds of retries.  If this extended Hello retry schedule is exhausted without receiving a HelloACK or Commit message, a late Commit message from the peer SHOULD still be accepted. </t>
+If the Hello retry schedule is exhausted without receiving a HelloACK or Commit message, a late Commit message from the peer SHOULD still be accepted.  If a ZRTP endpoint has evidence that the other party is a ZRTP endpoint, by receiving a Hello message or Ping message, or by receiving a Hello Hash in the signaling layer, it SHOULD extend its own Hello retry schedule indefinitely. </t>
 </list></t>
 <t>
 These recommended retransmission intervals are designed for a typical broadband Internet connection.  In some high-latency communication channels, such as those provided by some mobile phone environments or geostationary satellites, a different retransmission schedule may be used.  The initial value for the T1 or T2 retransmission timer should be increased to be no less than the round-trip time provided by the communications channel.  It should take into account the time required to transmit the entire message and the entire reply, as well as a reasonable time estimate to perform the DH calculation. </t>
