@@ -265,6 +265,8 @@ For example, assume that Alice supports protocol versions 1.10 and 2.00, and Bob
 <t>
 When comparing protocol versions, a ZRTP endpoint MUST include only the first three octets of the version field in the comparison.  The final octet is ignored, because it is not significant for interoperability.  For example, "1.1 ", "1.10", "1.11", or "1.1a" are all regarded as a version match, because they would all be interoperable versions. </t>
 <t>
+Version 1.11 of ZRTP is backward compatible with version 1.10 as specified in <xref target='RFC6189'/>.  Implementations of version 1.11 MUST operate according to <xref target='RFC6189'/> unless the other party advertises support for version 1.11 as described above.</t>
+<t>
 Changes in protocol version numbers are expected to be infrequent after version 1.10.  Supporting multiple versions adds code complexity and may introduce security weaknesses in the implementation.  The old adage about keeping it simple applies especially to implementing security protocols.  Endpoints SHOULD NOT support protocol versions earlier than version 1.10. </t>
 
 </section>
@@ -2993,6 +2995,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <?rfc include="reference.RFC.5479" ?>
 <?rfc include="reference.RFC.5759" ?>
 <?rfc include="reference.RFC.6188" ?>
+<?rfc include="reference.RFC.6189" ?>
 <?rfc include="reference.RFC.6637" ?>
 
 
