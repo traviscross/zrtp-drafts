@@ -1447,6 +1447,31 @@ The Signature Type Block specifies what signature algorithm is used to sign the 
 Additional details on the signature and signing key format may be found in <xref target="SignSAS"/>.  OpenPGP signatures (Signature Type "PGP ") are discussed in <xref target="SignSAS-OpenPGP"/>.  The ECDSA curves are over prime fields only, drawn from Appendix D.1.2 of <xref target="FIPS-186-3"/>.  X.509v3 ECDSA Signatures (Signature Type "X509") are discussed in <xref target="SignSAS-X509"/>. </t>
 
 </section>
+<section anchor='FingerprintType' title="Fingerprint Type Block">
+<t>
+The Fingerprint Type Block specifies what kind of key is being authenticated as discussed in <xref target="Fingerprint"/>.  The 4-octet Fingerprint Type Block, along with the accompanying fingerprint block, are OPTIONAL and may be present in the <xref target="Confirm_Msg">Confirm message</xref>.  The fingerprint types are given in the table below. </t>
+
+<figure><artwork>
+  Fingerprint | Meaning
+  Type Block  |
+  ---------------------------------------------
+  "TS25"      | The SHA-256 hash, truncated to
+              | 128 bits, of a Curve25519
+              | long-term identity public key
+              | used in TextSecure.
+  ---------------------------------------------
+  "TS41"      | The SHA-256 hash of a
+              | Curve41417 long-term identity
+              | public key used in TextSecure.
+  ---------------------------------------------
+
+  Table 8b. Fingerprint Type Block Values
+</artwork></figure>
+
+<t>
+Additional details on the signature and signing key format may be found in <xref target="SignSAS"/>.  OpenPGP signatures (Signature Type "PGP ") are discussed in <xref target="SignSAS-OpenPGP"/>.  The ECDSA curves are over prime fields only, drawn from Appendix D.1.2 of <xref target="FIPS-186-3"/>.  X.509v3 ECDSA Signatures (Signature Type "X509") are discussed in <xref target="SignSAS-X509"/>. </t>
+
+</section>
 </section>
 
 <section anchor='HelloMsg' title="Hello Message">
@@ -1775,13 +1800,15 @@ For version 1.11, the confirm_mac has been eliminated and replaced by a trailing
 <t>
 The first field inside the encrypted region is the hash preimage H0, which is defined in detail in <xref target='Hashchains'/>. </t>
 <t>
-The next 15 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages. </t>
+For version 1.10, the next 15 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages. The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature is present, the overall length of the Confirm1 or Confirm2 message will be set to 19 words. </t>
 <t>
-The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature is present, the overall length of the Confirm1 or Confirm2 message will be set to 19 words in version 1.10 and 15 words in version 1.11. </t>
+For version 1.11, the next 6 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages.  The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary.  The next 9 bits contain the fingerprint length.  If no fingerprint (described in <xref target='Fingerprint'/> is present, all bits are set to zero.  The fingerprint length is in words and includes the fingerprint type block.  If the fingerprint octet count is not a multiple of 4, zeros are added to pad it out to a word boundary.  If no signature and no fingerprint are present, the overall length of the Confirm1 or Confirm2 message will be set to 15 words. </t>
 <t>
 The next 8 bits are used for flags.  Undefined flags are set to zero and ignored.  Four flags are currently defined.  The PBX Enrollment flag (E) is a Boolean bit defined in <xref target='PBXenrollment'/>.  The SAS Verified flag (V) is a Boolean bit defined in <xref target='SASVerifiedFlag'/>.  The Allow Clear flag (A) is a Boolean bit defined in <xref target='GoClearTermination'/>.  The Disclosure Flag (D) is a Boolean bit defined in <xref target='DisclosureFlag'/>. The cache expiration interval is defined in <xref target='CacheOperation'/>. </t>
 <t>
 If the signature length (in words) is non-zero, a signature type block will be present along with a signature block.  Next, there is the signature block.  The signature block includes the signature and the key (or a link to the key) used to generate the signature (<xref target="SignSAS"/>). </t>
+<t>
+In version 1.11, if the fingerprint length (in words) is non-zero, a fingerprint type block will be present along with a fingerprint block.  Next, there is the fingerprint block.  The fingerprint block includes the fingerprint (<xref target="Fingerprint"/>). </t>
 <t>
 For version 1.10, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length of 128 bits, a full cipher block, and the final block is truncated to match the exact length of the encrypted data.  The CFB Initialization Vector is a 128-bit random nonce.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg_v1.10'/>). </t>
 <t>
@@ -1839,7 +1866,7 @@ The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator 
 |                             . . .                             |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|E|V|A|D| 
+| Unused 6b | sig len (9 bits)| fpt len (9 bits)|0 0 0 0|E|V|A|D|
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |              cache expiration interval (1 word)               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1847,6 +1874,14 @@ The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |           optional signature block (variable length)          |
+|                            . . .                              |
+|                                                               |
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      optional fingerprint type block (1 word if present)      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+|           optional fingerprint block (variable length)        |
 |                            . . .                              |
 |                                                               |
 |                                                               |
@@ -2682,6 +2717,16 @@ Some ZRTP user agents allow the user to manually switch to clear mode (via the G
 
 </section>
 
+<section anchor='Fingerprint' title="Fingerprint Transfer">
+<t>
+ZRTP provides a way to leverage the strong security association created by ZRTP to authenticate a public key used by each party outside of ZRTP.  A fingerprint of such a key can be transferred from each party to the other in the <xref target='Confirm_Msg'>Confirm packet</xref>. </t>
+<t>
+To use this mechanism, each party MAY place in its Confirm message a fingerprint of a public key whose private component the party wishes to assert it controls. </t>
+<t>
+When receiving such a fingerprint, a party SHOULD refrain from relying on the fingerprint until after the user verifies the SAS, and MUST NOT rely on the authenticity of such a fingerprint if it has detected a cache mismatch until an SAS verification is performed and the SAS is confirmed. </t>
+<t>
+The meaning of the fingerprint is specified by the Fingerprint Type Block as described in <xref target='FingerprintType'/>. </t>
+</section>
 <section anchor='IntermediaryZRTP' title="Intermediary ZRTP Devices">
 <t>
 This section discusses the operation of a ZRTP endpoint that is actually an intermediary.  For example, consider a device that proxies both signaling and media between endpoints.  There are three possible ways in which such a device could support ZRTP. </t>
