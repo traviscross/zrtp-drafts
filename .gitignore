@@ -1,7 +1,7 @@
 # gitignore
 /*.txt
 /*.html
-/*.nr
+/*.nroff
 /*.epub
 /*.pdf
 /*.ps
