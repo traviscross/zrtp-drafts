@@ -2927,6 +2927,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Annex A: Approved Security Functions for FIPS PUB 140-2</title>
 <author fullname='Federal Information Processing Standards'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST FIPS PUB 140-2 Annex A,' value='January 2011'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/fips/fips140-2/fips1402annexa.pdf'/>
@@ -2936,6 +2937,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Annex D: Approved Key Establishment Techniques for FIPS PUB 140-2</title>
 <author fullname='Federal Information Processing Standards'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST FIPS PUB 140-2 Annex D,' value='January 2011'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/fips/fips140-2/fips1402annexd.pdf'/>
@@ -2945,6 +2947,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Secure Hash Standard (SHS)</title>
 <author fullname='Federal Information Processing Standards'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST FIPS PUB 180-3,' value='October 2008'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/fips/fips180-3/fips180-3_final.pdf'/>
@@ -2954,6 +2957,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Digital Signature Standard (DSS)</title>
 <author fullname='Federal Information Processing Standards'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST FIPS PUB 186-3,' value='June 2009'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf'/>
@@ -2963,6 +2967,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Advanced Encryption Standard (AES)</title>
 <author fullname='Federal Information Processing Standards'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST FIPS PUB 197,' value='November 2001'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf'/>
@@ -2972,6 +2977,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>The Keyed-Hash Message Authentication Code (HMAC)</title>
 <author fullname='Federal Information Processing Standards'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST FIPS PUB 198-1,' value='July 2008'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf'/>
@@ -2981,6 +2987,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Recommendation for Block Cipher Modes of Operation</title>
   <author initials='M.' surname='Dworkin' fullname='Morris Dworkin'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST Special Publication 800-38A,' value='2001 Edition'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf'/>
@@ -2992,6 +2999,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <author initials='E.' surname='Barker' fullname='Elaine Barker'><organization/></author>
 <author initials='D.' surname='Johnson' fullname='Don Johnson'><organization/></author>
 <author initials='M.' surname='Smid' fullname='Miles Smid'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST Special Publication 800-56A' value='Revision 1, March 2007'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-56A/SP800-56A_Revision1_Mar08-2007.pdf'/>
@@ -3002,6 +3010,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <title>Recommendation for Random Number Generation Using Deterministic Random Bit Generators</title>
 <author initials='E.' surname='Barker' fullname='Elaine Barker'><organization/></author>
 <author initials='J.' surname='Kelsey' fullname='John Kelsey'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST Special Publication 800-90' value='(Revised), March 2007'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-90/SP800-90revised_March2007.pdf'/>
@@ -3011,6 +3020,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Recommendation for Key Derivation Using Pseudorandom Functions</title>
   <author initials='L.' surname='Chen' fullname='Lily Chen'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST Special Publication 800-108,' value='October 2009'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-108/sp800-108.pdf'/>
@@ -3020,6 +3030,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>NSA Suite B Cryptography</title>
 <author fullname='National Security Agency Information Assurance Directorate'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NSA Information Assurance Directorate,' value='NSA Suite B Cryptography'/>
 <format type='HTML' target='http://www.nsa.gov/ia/programs/suiteb_cryptography/index.shtml'/>
@@ -3030,6 +3041,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Suite B Implementer&apos;s Guide to NIST SP 800-56A</title>
 <author fullname='National Security Agency Information Assurance Directorate'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='Suite B Implementer&apos;s Guide to NIST SP 800-56A,' value='28 July 2009'/>
 <format type='HTML' target='http://www.nsa.gov/ia/_files/SuiteB_Implementer_G-113808.pdf'/>
@@ -3058,6 +3070,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
   <author initials='T.' surname='Kohno' fullname='Tadayoshi Kohno'><organization/></author>
   <author initials='J.' surname='Callas' fullname='Jon Callas'><organization/></author>
   <author initials='J.' surname='Walker' fullname='Jesse Walker'><organization/></author>
+<date/>
 </front>
 </reference>
 
@@ -3148,6 +3161,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
   <author initials='W.' surname='Burr' fullname='William Burr'><organization/></author>
   <author initials='W.' surname='Polk' fullname='William Polk'><organization/></author>
   <author initials='M.' surname='Smid' fullname='Miles Smid'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='NIST Special Publication 800-57 - Part 1' value='Revised March 2007'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf'/>
@@ -3158,6 +3172,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <title>Recommendation for the Transitioning of Cryptographic Algorithms and Key Lengths</title>
   <author initials='E.' surname='Barker' fullname='Elaine Barker'><organization/></author>
   <author initials='A.' surname='Roginsky' fullname='Allen Roginsky'><organization/></author>
+<date/>
 </front>
 <seriesInfo name= 'NIST Special Publication 800-131A' value='January 2011'/>
 <format type='HTML' target='http://csrc.nist.gov/publications/nistpubs/800-131A/sp800-131A.pdf'/>
@@ -3170,6 +3185,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <author fullname='Joan Daemen'><organization/></author>
 <author fullname='Michaël Peeters'><organization/></author>
 <author fullname='Gilles Van Assche'><organization/></author>
+<date/>
 </front>
 </reference>
 
@@ -3210,6 +3226,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>The Skein Hash Function Family - Web site</title>
   <author fullname='The Skein Hash Function design team'><organization/></author>
+<date/>
 </front>
 </reference>
 
@@ -3233,6 +3250,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <title>Practical Cryptography</title>
 <author initials='N.' surname='Ferguson' fullname='Niels Ferguson'><organization/></author>
 <author initials='B.' surname='Schneier' fullname='Bruce Schneier'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='Wiley Publishing,' value='2003'/>
 </reference>
@@ -3241,6 +3259,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>Whole-Word Phonetic Distances and the PGPfone Alphabet</title>
 <author initials ='P.' surname='Juola' fullname='Patrick Juola'><organization/></author> <author initials ='P.' surname='Zimmermann' fullname='Philip Zimmermann'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='Proceedings of the International Conference of Spoken Language Processing (ICSLP-96),' value='1996'/>
 <format type='HTML' target='http://www.mathcs.duq.edu/~juola/papers.d/icslp96.pdf'/>
@@ -3249,7 +3268,9 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <reference anchor='Juola2'>
 <front>
 <title>Isolated Word Confusion Metrics and the PGPfone Alphabet</title>
-<author initials ='P.' surname='Juola' fullname='Patrick Juola'><organization/></author> </front>
+<author initials ='P.' surname='Juola' fullname='Patrick Juola'><organization/></author>
+<date/>
+</front>
 <seriesInfo name='Proceedings of New Methods in Language Processing,' value='1996'/>
 <format type='HTML' target='http://www.mathcs.duq.edu/~juola/papers.d/pgpfonenemlap.ps'/>
 </reference>
@@ -3293,6 +3314,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <front>
 <title>The VP1 Protocol for Voice Privacy Devices Version 1.2</title>
 <author initials='E.' surname='Blossom' fullname='Eric A. Blossom'><organization/></author>
+<date/>
 </front>
 </reference>
 
@@ -3304,6 +3326,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <author initials ='S.' surname='Coull' fullname='Scott Coull'><organization/></author>
 <author initials ='F.' surname='Monrose' fullname='Fabian Monrose'><organization/></author>
 <author initials ='G.' surname='Masson' fullname='Gerald Masson'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='Proceedings of the 2008 IEEE Symposium on Security and Privacy' value='2008'/>
 </reference>
@@ -3316,6 +3339,7 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <author initials ='H.' surname='Almuhimedi' fullname='Hazim Almuhimedi'><organization/></author>
 <author initials ='N.' surname='Atri' fullname='Neha Atri'><organization/></author>
 <author initials ='L.' surname='Cranor' fullname='Lorrie Faith Cranor'><organization/></author>
+<date/>
 </front>
 <seriesInfo name='USENIX Security Symposium' value='2009'/>
 </reference>
