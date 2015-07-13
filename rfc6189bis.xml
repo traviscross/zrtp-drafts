@@ -6,6 +6,7 @@
 <?rfc rfcedstyle="yes"?>
 <?rfc subcompact="no"?>
 <rfc ipr="trust200902" number="6189bis" category="info"
+  obsoletes="6189"
   submissionType="IETF" consensus="yes">
 <front>
 <title abbrev="ZRTP">ZRTP: Media Path Key Agreement for Unicast Secure RTP</title>
@@ -52,7 +53,7 @@ This document defines ZRTP, a protocol for media path Diffie-Hellman exchange to
 <section title="Introduction">
 
 <t>
-ZRTP is a key agreement protocol that performs a Diffie-Hellman key exchange during call setup in the media path and is transported over the same port as the <xref target="RFC3550"> Real-time Transport Protocol (RTP)</xref> media stream which has been established using a signaling protocol such as <xref target="RFC3261">Session Initiation Protocol (SIP)</xref>.   This generates a shared secret, which is then used to generate keys and salt for a <xref target="RFC3711">Secure RTP (SRTP)</xref> session.  ZRTP borrows ideas from <xref target="PGPfone"/>.  A reference implementation of ZRTP is available in <xref target="Zfone"/>. </t>
+ZRTP is a key agreement protocol that performs a Diffie-Hellman key exchange during call setup in the media path and is transported over the same port as the <xref target="RFC3550"> Real-time Transport Protocol (RTP)</xref> media stream which has been established using a signaling protocol such as <xref target="RFC3261">Session Initiation Protocol (SIP)</xref>.   This generates a shared secret, which is then used to generate keys and salt for a <xref target="RFC3711">Secure RTP (SRTP)</xref> session.  ZRTP borrows ideas from <xref target="PGPfone"/>.  A reference implementation of ZRTP is available in <xref target="Zfone"/>.  This document obsoletes <xref target="RFC6189"/>. </t>
 <t>
 The ZRTP protocol has some nice cryptographic features lacking in many other approaches to media session encryption. Although it uses a public key algorithm, it does not rely on a public key infrastructure (PKI). In fact, it does not use persistent public keys at all. It uses ephemeral Diffie-Hellman (DH) with hash commitment and allows the detection of man-in-the-middle (MiTM) attacks by displaying a short authentication string (SAS) for the users to read and verbally compare over the phone. It has Perfect Forward Secrecy, meaning the keys are destroyed at the end of the call, which precludes retroactively compromising the call by future disclosures of key material. But even if the users are too lazy to bother with short authentication strings, we still get reasonable authentication against a MiTM attack, based on a form of key continuity. It does this by caching some key material to use in the next call, to be mixed in with the next call's DH shared secret, giving it key continuity properties analogous to Secure SHell (SSH). All this is done without reliance on a PKI, key certification, trust models, certificate authorities, or key management complexity that bedevils the email encryption world. It also does not rely on SIP signaling for the key management, and in fact, it does not rely on any servers at all. It performs its key agreements and key management in a purely peer-to-peer manner over the RTP packet stream. </t>
 <t>
