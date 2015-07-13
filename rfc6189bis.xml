@@ -861,7 +861,17 @@ The Confirm1 and Confirm2 messages (<xref target='Confirm_Msg'/>) contain the ca
   flagoctet =  (E * 2^3) + (V * 2^2) + (A * 2^1) + (D * 2^0) 
 </artwork></figure>
 <t>
-Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode and contain a 128-bit random Cipher FeedBack (CFB) Initialization Vector (IV). </t>
+Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode.   In version 1.10 these contain a 128-bit random Cipher FeedBack (CFB) Initialization Vector (IV). In version 1.11 and later, this initialization vector is computed by a KDF.  For the responder: </t>
+<figure><artwork>
+  confirm_iv = KDF(s0, "Responder ZRTP Confirm IV",
+                   KDF_Context, negotiated cipher block length)
+</artwork></figure>
+<t>
+For the initiator: </t>
+<figure><artwork>
+  confirm_iv = KDF(s0, "Initiator ZRTP Confirm IV",
+                   KDF_Context, negotiated cipher block length)
+</artwork></figure>
 <t>
 In version 1.10, the Confirm1 and Confirm2 messages also contain a MAC covering the encrypted part of the Confirm1 or Confirm2 message that includes a string of zeros, the signature length, flag octet, cache expiration interval, signature type block (if present), and <xref target="SignSAS">signature</xref> (if present).  For the responder: </t>
 <figure><artwork>
@@ -875,7 +885,7 @@ For the initiator: </t>
 <t>
 The mackeyi and mackeyr keys are computed in <xref target='DerivingKeys'/>. </t>
 <t>
-For version 1.11 and later, the confirm_mac is not used.  Instead the message ends in a MAC computed across the entire message (minus the MAC) as in other ZRTP messages.</t>
+For version 1.11 and later, the confirm_mac is not used.  Instead the message ends in a MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  </t>
 <t>
 The exchange is completed when the responder sends either the Conf2ACK message or the responder's first SRTP media packet (with a valid SRTP auth tag).  The initiator MUST treat the first valid SRTP media from the responder as equivalent to receiving a Conf2ACK.  The responder may respond to Confirm2 with either SRTP media, Conf2ACK, or both, in whichever order the responder chooses (or whichever order the "cloud" chooses to deliver them). </t>
 
@@ -1749,19 +1759,21 @@ The Confirm1 message is sent by the Responder in response to a valid DHPart2 mes
 <t>
 For version 1.10, the next field is the confirm_mac, a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='Confirm_Msg'/>).  This confirm_mac is keyed and computed according to <xref target='Confirmation'/>.  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the confirm_mac.</t>
 <t>
-For version 1.11, the confirm_mac has been eliminated and replaced by a trailing MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  Therefore the next 16 octets after the Message Type Block contain the CFB Initialization Vector.  The message then contains a section encrypted using CFB and is followed by a 2 word MAC. </t>
+For version 1.11, the confirm_mac has been eliminated and replaced by a trailing MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  The CFB Initialization Vector has also been removed and replaced by a KDF generated confirm_iv as described in <xref target='Confirmation'/>.  The message next contains a section encrypted using CFB and is followed by a 2 word MAC. </t>
 <t>
 The first field inside the encrypted region is the hash preimage H0, which is defined in detail in <xref target='Hashchains'/>. </t>
 <t>
 The next 15 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages. </t>
 <t>
-The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature is present, the overall length of the Confirm1 or Confirm2 message will be set to 19 words. </t>
+The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature is present, the overall length of the Confirm1 or Confirm2 message will be set to 19 words in version 1.10 and 15 words in version 1.11. </t>
 <t>
 The next 8 bits are used for flags.  Undefined flags are set to zero and ignored.  Four flags are currently defined.  The PBX Enrollment flag (E) is a Boolean bit defined in <xref target='PBXenrollment'/>.  The SAS Verified flag (V) is a Boolean bit defined in <xref target='SASVerifiedFlag'/>.  The Allow Clear flag (A) is a Boolean bit defined in <xref target='GoClearTermination'/>.  The Disclosure Flag (D) is a Boolean bit defined in <xref target='DisclosureFlag'/>. The cache expiration interval is defined in <xref target='CacheOperation'/>. </t>
 <t>
 If the signature length (in words) is non-zero, a signature type block will be present along with a signature block.  Next, there is the signature block.  The signature block includes the signature and the key (or a link to the key) used to generate the signature (<xref target="SignSAS"/>). </t>
 <t>
-<xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length of 128 bits, a full cipher block, and the final block is truncated to match the exact length of the encrypted data.  The CFB Initialization Vector is a 128-bit random nonce.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg'/>). </t>
+For version 1.10, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length of 128 bits, a full cipher block, and the final block is truncated to match the exact length of the encrypted data.  The CFB Initialization Vector is a 128-bit random nonce.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg_v1.10'/>). </t>
+<t>
+For version 1.11, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length equal to the negotiated cipher block length, and the final block is truncated to match the exact length of the encrypted data.  The initialization vector used for CFB is the confirm_iv specified in <xref target='Confirmation'/>.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg'/>). </t>
 <t>
 The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator uses the zrtpkeyi to encrypt the Confirm2 message. </t>
 
@@ -1808,11 +1820,6 @@ The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator 
 |0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |      Message Type Block="Confirm1" or "Confirm2" (2 words)    |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                CFB Initialization Vector (4 words)            |
-|                                                               |
 |                                                               |
 +===============================================================+
 |                                                               |
