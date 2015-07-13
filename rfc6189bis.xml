@@ -1541,7 +1541,7 @@ The HelloACK message is used to stop retransmissions of a Hello message.  A Hell
 The Commit message is sent to initiate the key agreement process after both sides have received a Hello message, which means it can only be sent after receiving both a Hello message and a HelloACK message.  There are three subtypes of Commit messages, whose formats are shown in Figures <xref target='DHCommit_Msg' format='counter'/>, <xref target='MultCommit_Msg' format='counter'/>, and <xref target='PrshCommit_Msg' format='counter'/>. </t>
 
 <t>
-The Commit message contains the Message Type Block, then the 256-bit hash image H2, which is defined in <xref target='Hashchains'/>.  The next parameter is the initiator's ZID, the 96-bit-long unique identifier for the ZRTP endpoint, which MUST have the same value as was used in the Hello message. </t>
+The Commit message contains the Message Type Block, then the 256-bit hash image H2, which is defined in <xref target='Hashchains'/>. </t>
 <t>
 Next, there is a list of algorithms selected by the initiator (hash, cipher, auth tag type, key agreement, sas type).  For a DH Commit, the hash value hvi is a hash of the DHPart2 of the Initiator and the Responder's Hello message, as explained in <xref target='HashCommit'/>. </t>
 <t>
@@ -1560,10 +1560,6 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 |                                                               |
 |                   Hash image H2 (8 words)                     |
 |                             . . .                             |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                         ZID  (3 words)                        |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                       hash algorithm                          |
@@ -1600,10 +1596,6 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 |                             . . .                             |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                         ZID  (3 words)                        |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                       hash algorithm                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      cipher algorithm                         |
@@ -1636,10 +1628,6 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 |                                                               |
 |                   Hash image H2 (8 words)                     |
 |                             . . .                             |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                         ZID  (3 words)                        |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                       hash algorithm                          |
