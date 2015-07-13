@@ -233,7 +233,7 @@ If a Hello message, or any other ZRTP message, indicates that there is a synchro
 <section anchor='version_negotiation' title="Protocol Version Negotiation">
 
 <t>
-This specification defines ZRTP version 1.11.  Since new versions of ZRTP may be developed in the future, this specification defines a protocol version negotiation in this section. </t>
+This specification defines ZRTP version 1.20.  Since new versions of ZRTP may be developed in the future, this specification defines a protocol version negotiation in this section. </t>
 <t>
 Each party declares what version of the ZRTP protocol they support via the version field in the Hello message (<xref target='HelloMsg'/>).  If both parties have the same version number in their Hello messages, they can proceed with the rest of the protocol.  To facilitate both parties reaching this state of protocol version agreement in their Hello messages, ZRTP should use information provided in the signaling layer, if available.  If a ZRTP endpoint supports more than one version of the protocol, it SHOULD declare them all in a list of SIP SDP a=zrtp-hash attributes (defined in <xref target='SignalingInteractions'/>), listing separate hashes, with separate ZRTP version numbers in each item in the list. </t>
 <t>
@@ -264,8 +264,6 @@ For example, assume that Alice supports protocol versions 1.10 and 2.00, and Bob
 
 <t>
 When comparing protocol versions, a ZRTP endpoint MUST include only the first three octets of the version field in the comparison.  The final octet is ignored, because it is not significant for interoperability.  For example, "1.1 ", "1.10", "1.11", or "1.1a" are all regarded as a version match, because they would all be interoperable versions. </t>
-<t>
-Version 1.11 of ZRTP is backward compatible with version 1.10 as specified in <xref target='RFC6189'/>.  Implementations of version 1.11 MUST operate according to <xref target='RFC6189'/> unless the other party advertises support for version 1.11 as described above.</t>
 <t>
 Changes in protocol version numbers are expected to be infrequent after version 1.10.  Supporting multiple versions adds code complexity and may introduce security weaknesses in the implementation.  The old adage about keeping it simple applies especially to implementing security protocols.  Endpoints SHOULD NOT support protocol versions earlier than version 1.10. </t>
 
@@ -511,11 +509,6 @@ The initiator calculates the same Diffie-Hellman result using: </t>
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange in the following order is calculated by both parties: </t>
 <figure><artwork>
-  ;; for ZRTP version 1.10
-  total_hash = hash(Hello of responder || Commit || 
-                    DHPart1 || DHPart2)
-
-  ;; for ZRTP version 1.11
   total_hash = hash(Hello of initiator ||
                     Hello of responder ||
                     Commit || DHPart1 || DHPart2)
@@ -641,10 +634,6 @@ and the H3 field in the responder's <xref target='Hello_Msg'>Hello message</xref
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange for the current media stream is calculated: </t>
 <figure><artwork>
-  ;; for ZRTP version 1.10
-  total_hash = hash(Hello of responder || Commit)
-
-  ;; for ZRTP version 1.11
   total_hash = hash(Hello of initiator ||
                     Hello of responder ||
                     Commit)
@@ -713,10 +702,6 @@ and the H3 field in the responder's <xref target='Hello_Msg'>Hello message</xref
 <t>
 A hash of the received and sent ZRTP messages in the current ZRTP exchange for the current media stream is calculated: </t>
 <figure><artwork>
-  ;; for ZRTP version 1.10
-  total_hash = hash(Hello of responder || Commit) 
-
-  ;; for ZRTP version 1.11
   total_hash = hash(Hello of initiator ||
                     Hello of responder ||
                     Commit) 
@@ -863,7 +848,7 @@ The Confirm1 and Confirm2 messages (<xref target='Confirm_Msg'/>) contain the ca
   flagoctet =  (E * 2^3) + (V * 2^2) + (A * 2^1) + (D * 2^0) 
 </artwork></figure>
 <t>
-Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode.   In version 1.10 these contain a 128-bit random Cipher FeedBack (CFB) Initialization Vector (IV). In version 1.11 and later, this initialization vector is computed by a KDF.  For the responder: </t>
+Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode.   The initialization vector for CFB is computed by a KDF.  For the responder: </t>
 <figure><artwork>
   confirm_iv = KDF(s0, "Responder ZRTP Confirm IV",
                    KDF_Context, negotiated cipher block length)
@@ -887,19 +872,7 @@ For the initiator: </t>
                     KDF_Context, negotiated cipher block length)
 </artwork></figure>
 <t>
-In version 1.10, the Confirm1 and Confirm2 messages also contain a MAC covering the encrypted part of the Confirm1 or Confirm2 message that includes a string of zeros, the signature length, flag octet, cache expiration interval, signature type block (if present), and <xref target="SignSAS">signature</xref> (if present).  For the responder: </t>
-<figure><artwork>
-  confirm_mac = MAC(mackeyr, encrypted part of Confirm1) 
-</artwork></figure>
-<t>
-For the initiator: </t>
-<figure><artwork>
-  confirm_mac = MAC(mackeyi, encrypted part of Confirm2) 
-</artwork></figure>
-<t>
 The mackeyi and mackeyr keys are computed in <xref target='DerivingKeys'/>. </t>
-<t>
-For version 1.11 and later, the confirm_mac is not used.  Instead the message ends in a MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  </t>
 <t>
 The exchange is completed when the responder sends either the Conf2ACK message or the responder's first SRTP media packet (with a valid SRTP auth tag).  The initiator MUST treat the first valid SRTP media from the responder as equivalent to receiving a Conf2ACK.  The responder may respond to Confirm2 with either SRTP media, Conf2ACK, or both, in whichever order the responder chooses (or whichever order the "cloud" chooses to deliver them). </t>
 
@@ -1252,7 +1225,7 @@ The MACs that are keyed by this hash chain, as defined in <xref target='Leveragi
 The Hello Hash in the a=zrtp-hash attribute defined in <xref target='Binding2Signaling'/>. </t>
 </list></t>
 <t>
-ZRTP defines a method for <xref target='version_negotiation'>negotiating different ZRTP protocol versions</xref>.  SHA-256 is the Implicit Hash and HMAC-SHA-256 is the Implicit MAC for ZRTP protocol version 1.11.  Future ZRTP protocol versions may, if appropriate, use another hash algorithm as the Implicit Hash, such as the <xref target='Keccak'> SHA-3 hash</xref>.  For example, a future SIP packet may list two a=zrtp-hash SDP attributes, one based on SHA-256 for ZRTP version 1.10, and another based on SHA-3 for ZRTP version 2.00. </t>
+ZRTP defines a method for <xref target='version_negotiation'>negotiating different ZRTP protocol versions</xref>.  SHA-256 is the Implicit Hash and HMAC-SHA-256 is the Implicit MAC for ZRTP protocol version 1.20.  Future ZRTP protocol versions may, if appropriate, use another hash algorithm as the Implicit Hash, such as the <xref target='Keccak'> SHA-3 hash</xref>.  For example, a future SIP packet may list two a=zrtp-hash SDP attributes, one based on SHA-256 for ZRTP version 1.10, and another based on SHA-3 for ZRTP version 2.00. </t>
 
 </section>
 
@@ -1482,7 +1455,7 @@ The Hello message has the format shown in <xref target='Hello_Msg'/>. </t>
 <t>
 All ZRTP messages begin with the preamble value 0x505a, then a 16-bit length in 32-bit words.  This length includes only the ZRTP message (including the preamble and the length) but not the ZRTP packet header or CRC.  The 8-octet Message Type follows the length field. </t>
 <t>
-Next, there is a 4-character string containing the version (ver) of the ZRTP protocol, which is "1.11" for this specification. 
+Next, there is a 4-character string containing the version (ver) of the ZRTP protocol, which is "1.20" for this specification. 
 Next, there is the Client Identifier string (cid), which is 4 words long and identifies the vendor and release of the ZRTP software. 
 The 256-bit hash image H3 is defined in <xref target='Hashchains'/>.  The next parameter is the ZID, the 96-bit-long unique identifier for the ZRTP endpoint, defined in <xref target='CacheOperation'/>. </t>
 <t>
@@ -1511,7 +1484,7 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 |            Message Type Block="Hello   " (2 words)            |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   version="1.11" (1 word)                     |
+|                   version="1.20" (1 word)                     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |                Client Identifier (4 words)                    |
@@ -1796,65 +1769,23 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 <t>
 The Confirm1 message is sent by the Responder in response to a valid DHPart2 message after the SRTP session key and parameters have been negotiated. The Confirm2 message is sent by the Initiator in response to a Confirm1 message.  The format is shown in <xref target='Confirm_Msg'/>.  The message contains the Message Type Block "Confirm1" or "Confirm2". </t>
 <t>
-For version 1.10, the next field is the confirm_mac, a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='Confirm_Msg'/>).  This confirm_mac is keyed and computed according to <xref target='Confirmation'/>.  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the confirm_mac.</t>
-<t>
-For version 1.11, the confirm_mac has been eliminated and replaced by a trailing MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  The CFB Initialization Vector has also been removed and replaced by a KDF generated confirm_iv as described in <xref target='Confirmation'/>.  The message next contains a section encrypted using CFB and is followed by a 2 word MAC. </t>
+The message next contains a section encrypted using CFB and is followed by a 2 word MAC.  The confirm_iv described in <xref target='Confirmation'/> is used as the initialization vector for the CFB encryption.  After the encrypted section, a trailing MAC is computed across the entire message (minus the MAC) as in other ZRTP messages. </t>
 <t>
 The first field inside the encrypted region is the hash preimage H0, which is defined in detail in <xref target='Hashchains'/>. </t>
 <t>
-For version 1.10, the next 15 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages. The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature is present, the overall length of the Confirm1 or Confirm2 message will be set to 19 words. </t>
-<t>
-For version 1.11, the next 6 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages.  The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary.  The next 9 bits contain the fingerprint length.  If no fingerprint (described in <xref target='Fingerprint'/> is present, all bits are set to zero.  The fingerprint length is in words and includes the fingerprint type block.  If the fingerprint octet count is not a multiple of 4, zeros are added to pad it out to a word boundary.  If no signature and no fingerprint are present, the overall length of the Confirm1 or Confirm2 message will be set to 15 words. </t>
+The next 6 bits are not used and SHOULD be set to zero when sent and MUST be ignored when received in Confirm1 or Confirm2 messages.  The next 9 bits contain the signature length.  If no SAS signature (described in <xref target='SignSAS'/>) is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary.  The next 9 bits contain the fingerprint length.  If no fingerprint (described in <xref target='Fingerprint'/> is present, all bits are set to zero.  The fingerprint length is in words and includes the fingerprint type block.  If the fingerprint octet count is not a multiple of 4, zeros are added to pad it out to a word boundary.  If no signature and no fingerprint are present, the overall length of the Confirm1 or Confirm2 message will be set to 15 words. </t>
 <t>
 The next 8 bits are used for flags.  Undefined flags are set to zero and ignored.  Four flags are currently defined.  The PBX Enrollment flag (E) is a Boolean bit defined in <xref target='PBXenrollment'/>.  The SAS Verified flag (V) is a Boolean bit defined in <xref target='SASVerifiedFlag'/>.  The Allow Clear flag (A) is a Boolean bit defined in <xref target='GoClearTermination'/>.  The Disclosure Flag (D) is a Boolean bit defined in <xref target='DisclosureFlag'/>. The cache expiration interval is defined in <xref target='CacheOperation'/>. </t>
 <t>
 If the signature length (in words) is non-zero, a signature type block will be present along with a signature block.  Next, there is the signature block.  The signature block includes the signature and the key (or a link to the key) used to generate the signature (<xref target="SignSAS"/>). </t>
 <t>
-In version 1.11, if the fingerprint length (in words) is non-zero, a fingerprint type block will be present along with a fingerprint block.  Next, there is the fingerprint block.  The fingerprint block includes the fingerprint (<xref target="Fingerprint"/>). </t>
+If the fingerprint length (in words) is non-zero, a fingerprint type block will be present along with a fingerprint block.  Next, there is the fingerprint block.  The fingerprint block includes the fingerprint (<xref target="Fingerprint"/>). </t>
 <t>
-For version 1.10, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length of 128 bits, a full cipher block, and the final block is truncated to match the exact length of the encrypted data.  The CFB Initialization Vector is a 128-bit random nonce.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg_v1.10'/>). </t>
-<t>
-For version 1.11, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length equal to the negotiated cipher block length, and the final block is truncated to match the exact length of the encrypted data.  The initialization vector used for CFB is the confirm_iv specified in <xref target='Confirmation'/>.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg'/>). </t>
+<xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length equal to the negotiated cipher block length, and the final block is truncated to match the exact length of the encrypted data.  The initialization vector used for CFB is the confirm_iv specified in <xref target='Confirmation'/>.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='Confirm_Msg'/>). </t>
 <t>
 The responder uses the zrtpkeyr to encrypt the Confirm1 message.  The initiator uses the zrtpkeyi to encrypt the Confirm2 message. </t>
 
-<figure anchor='Confirm_Msg_v1.10' title="Confirm1 and Confirm2 Message Format v1.10"><artwork>
- 0                   1                   2                   3 
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|      Message Type Block="Confirm1" or "Confirm2" (2 words)    |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                     confirm_mac (2 words)                     |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                CFB Initialization Vector (4 words)            |
-|                                                               |
-|                                                               |
-+===============================================================+
-|                                                               |
-|                  Hash preimage H0 (8 words)                   |
-|                             . . .                             |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|E|V|A|D| 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|              cache expiration interval (1 word)               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|      optional signature type block (1 word if present)        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|           optional signature block (variable length)          |
-|                            . . .                              |
-|                                                               |
-|                                                               |
-+===============================================================+
-</artwork></figure>
-
-<figure anchor='Confirm_Msg' title="Confirm1 and Confirm2 Message Format v1.11"><artwork>
+<figure anchor='Confirm_Msg' title="Confirm1 and Confirm2 Message Format"><artwork>
  0                   1                   2                   3 
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
@@ -2047,13 +1978,11 @@ If a device, usually a PBX, sends an SASrelay message, it MUST have previously d
 <t>
 The SASrelay message format is shown in <xref target='SASrelay_Msg'/>.  The message contains the Message Type Block "SASrelay". </t>
 <t>
-For version 1.10, the next field is the confirm_mac, a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='SASrelay_Msg'/>).  This confirm_mac is keyed and computed according to <xref target='Confirmation'/>.  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the confirm_mac.</t>
-<t>
-For version 1.11, the confirm_mac has been eliminated and replaced by a trailing MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  The CFB Initialization Vector has also been removed and replaced by a KDF generated sasrelay_iv as described in <xref target='Confirmation'/>.  The message next contains a section encrypted using CFB and is followed by a 2 word MAC. </t>
+The message next contains a section encrypted using CFB and is followed by a 2 word MAC.  The confirm_iv described in <xref target='Confirmation'/> is used as the initialization vector for the CFB encryption.  After the encrypted section, a trailing MAC is computed across the entire message (minus the MAC) as in other ZRTP messages. </t>
 <t>
 The next 15 bits are not used and SHOULD be set to zero when sent, and they MUST be ignored when received in SASrelay messages. </t>
 <t>
-The next 9 bits contain the signature length.  The trusted MiTM MAY compute a digital signature on the SAS hash, as described in <xref target='SignSAS'/>, using a persistent signing key owned by the trusted MiTM.  If no SAS signature is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature block is present, the overall length of the SASrelay message will be set to 19 words in version 1.10 and 15 words in version 1.11. </t>
+The next 9 bits contain the signature length.  The trusted MiTM MAY compute a digital signature on the SAS hash, as described in <xref target='SignSAS'/>, using a persistent signing key owned by the trusted MiTM.  If no SAS signature is present, all bits are set to zero.  The signature length is in words and includes the signature type block. If the calculated signature octet count is not a multiple of 4, zeros are added to pad it out to a word boundary. If no signature block is present, the overall length of the SASrelay message will be set to 15 words in version 1.20. </t>
 <t>
 The next 8 bits are used for flags.  Undefined flags are set to zero and ignored. Three flags are currently defined.  The Disclosure Flag (D) is a Boolean bit defined in <xref target='DisclosureFlag'/>. The Allow Clear flag (A) is a Boolean bit defined in <xref target='GoClearTermination'/>.  The SAS Verified flag (V) is a Boolean bit defined in <xref target='SASVerifiedFlag'/>. These flags are updated values to the same flags provided earlier in the Confirm message, but they are updated to reflect the new flag information relayed by the PBX from the other party. </t>
 <t>
@@ -2063,49 +1992,11 @@ The next 32-bit word contains the SAS rendering scheme for the relayed sashash, 
 <t>
 If the signature length (in words) is non-zero, a signature type block will be present along with a signature block.  Next, there is the signature block.  The signature block includes the signature and the key (or a link to the key) used to generate the signature (<xref target="SignSAS"/>). </t>
 <t>
-For version 1.10, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length of 128 bits, a full cipher block, and the final block is truncated to match the exact length of the encrypted data.  The CFB Initialization Vector is a 128-bit random nonce.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='SASrelay_Msg_v1.10'/>). </t>
-<t>
-For version 1.11, <xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length equal to the negotiated cipher block length, and the final block is truncated to match the exact length of the encrypted data.  The initialization vector used for CFB is the sasrelay_iv specified in <xref target='Confirmation'/>.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='SASrelay_Msg'/>). </t>
+<xref target='NIST-SP800-38A'>CFB mode</xref> is applied with a feedback length equal to the negotiated cipher block length, and the final block is truncated to match the exact length of the encrypted data.  The initialization vector used for CFB is the sasrelay_iv specified in <xref target='Confirmation'/>.  The block cipher algorithm and the key size are the same as the <xref target='CipherTypeBlock'>negotiated block cipher</xref> for media encryption.  CFB is used to encrypt the part of the Confirm1 message beginning after the CFB IV to the end of the message (the encrypted region is enclosed by "====" in <xref target='SASrelay_Msg'/>). </t>
 <t>
 Depending on whether the trusted MiTM had taken the role of the initiator or the responder during the ZRTP key negotiation, the SASrelay message is encrypted with zrtpkeyi or zrtpkeyr. </t>
 
-<figure anchor='SASrelay_Msg_v1.10' title="SASrelay Message Format v1.10"><artwork>
- 0                   1                   2                   3 
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
-|0 1 0 1 0 0 0 0 0 1 0 1 1 0 1 0|         length=variable       |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|             Message Type Block="SASrelay" (2 words)           |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                         MAC (2 words)                         |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|                CFB Initialization Vector (4 words)            |
-|                                                               |
-|                                                               |
-+===============================================================+
-| Unused (15 bits of zeros)   | sig len (9 bits)|0 0 0 0|0|V|A|D| 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           rendering scheme of relayed SAS (1 word)            |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|            Trusted MiTM relayed sashash (8 words)             |
-|                             . . .                             |
-|                                                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|      optional signature type block (1 word if present)        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-|           optional signature block (variable length)          |
-|                            . . .                              |
-|                                                               |
-|                                                               |
-+===============================================================+
-</artwork></figure>
-
-<figure anchor='SASrelay_Msg' title="SASrelay Message Format v1.11"><artwork>
+<figure anchor='SASrelay_Msg' title="SASrelay Message Format"><artwork>
  0                   1                   2                   3 
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
@@ -2179,7 +2070,7 @@ The Ping message contains a version number that defines what version of PingACK 
 |             Message Type Block="Ping    " (2 words)           |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   version="1.11" (1 word)                     |
+|                   version="1.20" (1 word)                     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                    EndpointHash (2 words)                     |
 |                                                               |
@@ -2202,7 +2093,7 @@ This is not always easy to do, as it may have to be done without help from the s
 <section anchor='PingACKMsg' title="PingACK Message">
 
 <t>
-A PingACK message is sent only in response to a Ping.  A ZRTP endpoint MUST respond to a Ping with a PingACK message. The version of PingACK requested is contained in the Ping message.  If that version number is supported, a PingACK with a format that matches that version MUST be sent.  Otherwise, if the version number of the Ping is not supported, a PingACK SHOULD be sent in the format of the highest supported version known to the Ping responder.  Only version "1.10" or "1.11" is supported in this specification. </t>
+A PingACK message is sent only in response to a Ping.  A ZRTP endpoint MUST respond to a Ping with a PingACK message. The version of PingACK requested is contained in the Ping message.  If that version number is supported, a PingACK with a format that matches that version MUST be sent.  Otherwise, if the version number of the Ping is not supported, a PingACK SHOULD be sent in the format of the highest supported version known to the Ping responder.  Only version "1.20" is supported in this specification. </t>
 <t>
 The PingACK message carries its own 64-bit EndpointHash, distinct from the EndpointHash of the other party's Ping message.  It is REQUIRED that it be highly improbable for two participants in a call to have the same EndpointHash and that an EndpointHash maintains a persistent value between calls.  For a normal ZRTP endpoint, such as a ZRTP-enabled VoIP client, the EndpointHash can be just the truncated ZID.  For a ZRTP endpoint such as a PBX that has multiple endpoints behind it, the EndpointHash must be a distinct value for each endpoint behind it.  It is recommended that the EndpointHash be a truncated hash of the ZID of the ZRTP endpoint concatenated with something unique about the actual endpoint or phone behind the PBX.  This may be the SIP URI of the phone, the PBX extension number, or the local IP address of the phone, whichever is more readily available in the application environment: </t>
 <figure><artwork>
@@ -2227,7 +2118,7 @@ The PingACK message contains the EndpointHash of the sender of the PingACK as we
 |             Message Type Block="PingACK " (2 words)           |
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   version="1.11" (1 word)                     |
+|                   version="1.20" (1 word)                     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |           EndpointHash of PingACK Sender (2 words)            |
 |                                                               |
@@ -2573,7 +2464,7 @@ Here's an example of the ZRTP attribute in an initial SDP offer or answer used a
   a=rtpmap:97 iLBC/8000
   a=rtpmap:33 no-op/8000
 &lt;allOneLine&gt;
-  a=zrtp-hash:1.11 fe30efd02423cb054e50efd0248742ac7a52c8f91bc2
+  a=zrtp-hash:1.20 fe30efd02423cb054e50efd0248742ac7a52c8f91bc2
   df881ae642c371ba46df
 &lt;/allOneLine&gt;
 </artwork></figure>
