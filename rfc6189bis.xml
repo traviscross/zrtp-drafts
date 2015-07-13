@@ -861,7 +861,9 @@ The Confirm1 and Confirm2 messages (<xref target='Confirm_Msg'/>) contain the ca
   flagoctet =  (E * 2^3) + (V * 2^2) + (A * 2^1) + (D * 2^0) 
 </artwork></figure>
 <t>
-Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode and contain a 128-bit random Cipher FeedBack (CFB) Initialization Vector (IV).  The Confirm1 and Confirm2 messages also contain a MAC covering the encrypted part of the Confirm1 or Confirm2 message that includes a string of zeros, the signature length, flag octet, cache expiration interval, signature type block (if present), and <xref target="SignSAS">signature</xref> (if present).  For the responder: </t>
+Part of the Confirm1 and Confirm2 messages are encrypted using full-block Cipher Feedback Mode and contain a 128-bit random Cipher FeedBack (CFB) Initialization Vector (IV). </t>
+<t>
+In version 1.10, the Confirm1 and Confirm2 messages also contain a MAC covering the encrypted part of the Confirm1 or Confirm2 message that includes a string of zeros, the signature length, flag octet, cache expiration interval, signature type block (if present), and <xref target="SignSAS">signature</xref> (if present).  For the responder: </t>
 <figure><artwork>
   confirm_mac = MAC(mackeyr, encrypted part of Confirm1) 
 </artwork></figure>
@@ -872,6 +874,8 @@ For the initiator: </t>
 </artwork></figure>
 <t>
 The mackeyi and mackeyr keys are computed in <xref target='DerivingKeys'/>. </t>
+<t>
+For version 1.11 and later, the confirm_mac is not used.  Instead the message ends in a MAC computed across the entire message (minus the MAC) as in other ZRTP messages.</t>
 <t>
 The exchange is completed when the responder sends either the Conf2ACK message or the responder's first SRTP media packet (with a valid SRTP auth tag).  The initiator MUST treat the first valid SRTP media from the responder as equivalent to receiving a Conf2ACK.  The responder may respond to Confirm2 with either SRTP media, Conf2ACK, or both, in whichever order the responder chooses (or whichever order the "cloud" chooses to deliver them). </t>
 
@@ -1741,7 +1745,11 @@ The 64-bit MAC at the end of the message is computed across the whole message, n
 
 <section anchor='ConfirmMsg' title="Confirm1 and Confirm2 Messages">
 <t>
-The Confirm1 message is sent by the Responder in response to a valid DHPart2 message after the SRTP session key and parameters have been negotiated. The Confirm2 message is sent by the Initiator in response to a Confirm1 message.  The format is shown in <xref target='Confirm_Msg'/>.  The message contains the Message Type Block "Confirm1" or "Confirm2". Next, there is the confirm_mac, a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='Confirm_Msg'/>).  This confirm_mac is keyed and computed according to <xref target='Confirmation'/>.  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the confirm_mac. </t>
+The Confirm1 message is sent by the Responder in response to a valid DHPart2 message after the SRTP session key and parameters have been negotiated. The Confirm2 message is sent by the Initiator in response to a Confirm1 message.  The format is shown in <xref target='Confirm_Msg'/>.  The message contains the Message Type Block "Confirm1" or "Confirm2". </t>
+<t>
+For version 1.10, the next field is the confirm_mac, a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='Confirm_Msg'/>).  This confirm_mac is keyed and computed according to <xref target='Confirmation'/>.  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the confirm_mac.</t>
+<t>
+For version 1.11, the confirm_mac has been eliminated and replaced by a trailing MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  Therefore the next 16 octets after the Message Type Block contain the CFB Initialization Vector.  The message then contains a section encrypted using CFB and is followed by a 2 word MAC. </t>
 <t>
 The first field inside the encrypted region is the hash preimage H0, which is defined in detail in <xref target='Hashchains'/>. </t>
 <t>
@@ -1981,7 +1989,11 @@ The SASrelay message is sent by a trusted MiTM, most often a PBX.  It is not sen
 <t>
 If a device, usually a PBX, sends an SASrelay message, it MUST have previously declared itself as a MiTM device by setting the MiTM (M) flag in the <xref target='HelloMsg'>Hello message</xref>. If the receiver of the SASrelay message did not previously receive a Hello message with the MiTM (M) flag set, the Relayed SAS SHOULD NOT be rendered.  A RelayACK is still sent, but no Error message is sent. </t>
 <t>
-The SASrelay message format is shown in <xref target='SASrelay_Msg'/>.  The message contains the Message Type Block "SASrelay". Next, there is a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='SASrelay_Msg'/>).  This MAC is keyed the same way as the confirm_mac in the Confirm messages (see <xref target='Confirmation'/>).  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the MAC. </t>
+The SASrelay message format is shown in <xref target='SASrelay_Msg'/>.  The message contains the Message Type Block "SASrelay". </t>
+<t>
+For version 1.10, the next field is the confirm_mac, a MAC computed over the encrypted part of the message (shown enclosed by "====" in <xref target='SASrelay_Msg'/>).  This confirm_mac is keyed and computed according to <xref target='Confirmation'/>.  The next 16 octets contain the CFB Initialization Vector.  The rest of the message is encrypted using CFB and protected by the confirm_mac.</t>
+<t>
+For version 1.11, the confirm_mac has been eliminated and replaced by a trailing MAC computed across the entire message (minus the MAC) as in other ZRTP messages.  Therefore the next 16 octets after the Message Type Block contain the CFB Initialization Vector.  The message then contains a section encrypted using CFB and is followed by a 2 word MAC. </t>
 <t>
 The next 15 bits are not used and SHOULD be set to zero when sent, and they MUST be ignored when received in SASrelay messages. </t>
 <t>
