@@ -3137,10 +3137,10 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <reference anchor='Keccak' target='http://keccak.noekeon.org/'>
 <front>
 <title>The Keccak Sponge Function Family</title>
-<author fullname='Guido Bertoni'><organization/></author>
-<author fullname='Joan Daemen'><organization/></author>
-<author fullname='Michaël Peeters'><organization/></author>
-<author fullname='Gilles Van Assche'><organization/></author>
+<author surname="Bertoni" fullname='Guido Bertoni'><organization/></author>
+<author surname="Daemen" fullname='Joan Daemen'><organization/></author>
+<author surname="Peeters" fullname='Michaël Peeters'><organization/></author>
+<author surname="Van Assche" fullname='Gilles Van Assche'><organization/></author>
 <date/>
 </front>
 </reference>
@@ -3148,10 +3148,10 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <reference anchor='Keccak-ref' target='http://keccak.noekeon.org/Keccak-reference-3.0.pdf'>
 <front>
 <title>The Keccak Reference (Version 3.0)</title>
-<author fullname='Guido Bertoni'><organization/></author>
-<author fullname='Joan Daemen'><organization/></author>
-<author fullname='Michaël Peeters'><organization/></author>
-<author fullname='Gilles Van Assche'><organization/></author>
+<author surname="Bertoni" fullname='Guido Bertoni'><organization/></author>
+<author surname="Daemen" fullname='Joan Daemen'><organization/></author>
+<author surname="Peeters" fullname='Michaël Peeters'><organization/></author>
+<author surname="Van Assche" fullname='Gilles Van Assche'><organization/></author>
 <date day="14" month="January" year="2011"/>
 </front>
 </reference>
@@ -3159,10 +3159,10 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <reference anchor='Keccak-sub' target='http://keccak.noekeon.org/Keccak-submission-3.pdf'>
 <front>
 <title>The Keccak SHA-3 Submission (Version 3.0)</title>
-<author fullname='Guido Bertoni'><organization/></author>
-<author fullname='Joan Daemen'><organization/></author>
-<author fullname='Michaël Peeters'><organization/></author>
-<author fullname='Gilles Van Assche'><organization/></author>
+<author surname="Bertoni" fullname='Guido Bertoni'><organization/></author>
+<author surname="Daemen" fullname='Joan Daemen'><organization/></author>
+<author surname="Peeters" fullname='Michaël Peeters'><organization/></author>
+<author surname="Van Assche" fullname='Gilles Van Assche'><organization/></author>
 <date day="14" month="January" year="2011"/>
 </front>
 </reference>
@@ -3170,10 +3170,10 @@ The use of one-way hash chains to key HMACs in ZRTP is similar to Adrian Perrig'
 <reference anchor='Sponge' target='http://sponge.noekeon.org/CSF-0.1.pdf'>
 <front>
 <title>Cryptographic Sponge Functions (Version 0.1)</title>
-<author fullname='Guido Bertoni'><organization/></author>
-<author fullname='Joan Daemen'><organization/></author>
-<author fullname='Michaël Peeters'><organization/></author>
-<author fullname='Gilles Van Assche'><organization/></author>
+<author surname="Bertoni" fullname='Guido Bertoni'><organization/></author>
+<author surname="Daemen" fullname='Joan Daemen'><organization/></author>
+<author surname="Peeters" fullname='Michaël Peeters'><organization/></author>
+<author surname="Van Assche" fullname='Gilles Van Assche'><organization/></author>
 <date day="14" month="January" year="2011"/>
 </front>
 </reference>
